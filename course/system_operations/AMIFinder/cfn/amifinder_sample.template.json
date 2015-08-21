@@ -1,0 +1,61 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Create Infrastructure required to run finAMI Custom resource",
+
+    "Parameters" : {
+        "KeyName" : {
+            "Description" : "Name of an existing EC2 KeyPair to enable SSH access to the Instance",
+            "Type" : "String",
+            "Default" : "sst-aws"
+        },
+        "InstanceType" : {
+            "Description" : "Instance type",
+            "Type" : "String",
+            "Default" : "t1.micro",
+            "AllowedValues" : [ "t1.micro","m3.medium","m3.large"],
+            "ConstraintDescription" : "must be a valid EC2 instance type."
+        }
+    },
+
+    "Resources": {
+        "AMIFinder": {
+            "Type": "Custom::AMIFinder",
+            "Version": "1.0",
+            "Properties": {
+                "ServiceToken": "<insert ARN of Topic created for AMIFinder Custom Resource>",
+                "Version": "2012"
+            }
+        },
+        "RDPSecurityGroup" : {
+            "Type" : "AWS::EC2::SecurityGroup",
+            "Properties" : {
+                "GroupDescription" : "RDP to the instance",
+                "SecurityGroupIngress" : [
+                    {
+                        "CidrIp" : "0.0.0.0/0",
+                        "FromPort" : "3389",
+                        "ToPort" : "3389",
+                        "IpProtocol" : "tcp"
+                    }
+                ]
+            }
+        },
+        "WindowsInstance" : {
+            "Type" : "AWS::EC2::Instance",
+            "Properties" : {
+                "ImageId" : { "Ref" : "AMIFinder" },
+                "InstanceType" : { "Ref" : "InstanceType" },
+                "KeyName" : { "Ref" : "KeyName" },
+                "SecurityGroups" : [{ "Ref" : "RDPSecurityGroup" }]
+            }
+        }
+    },
+    "Outputs" : {
+        "WindowsAMIID" : {
+            "Value" : { "Ref" : "AMIFinder" }
+        },
+        "WindowsInstanceDNSName" : {
+            "Value" : { "Fn::GetAtt" : [ "WindowsInstance" , "PublicDnsName" ] }
+        }
+    }
+}

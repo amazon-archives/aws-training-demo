@@ -1,0 +1,6 @@
+[
+	{"ParameterKey":"SharedSecret", "ParameterValue":"SharedSecret"},
+	{"ParameterKey":"Username", "ParameterValue":"user"},
+	{"ParameterKey":"Password", "ParameterValue":"password"},
+	{"ParameterKey":"HostedDomain", "ParameterValue":"aws-emea.info"}
+]

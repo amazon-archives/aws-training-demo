@@ -1,0 +1,9 @@
+{
+   "source" : "iam|signin|sts",
+   "regexp" : "Password|AccessKey|PutRolePolicy|User|Token|Login",
+   "sns" : {
+      "region" : "REGION",
+      "endpointARN" : "",
+      "topicARN" : "TOPICARN"
+   }
+}

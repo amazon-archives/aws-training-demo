@@ -1,0 +1,281 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Create Infrastructure required to run finAMI Custom resource",
+
+    "Parameters" : {
+        "KeyName" : {
+            "Description" : "Name of an existing EC2 KeyPair to enable SSH access to the Instance",
+            "Type" : "String",
+            "Default" : "sst-aws"
+        },
+        "InstanceType" : {
+            "Description" : "Instance type",
+            "Type" : "String",
+            "Default" : "t1.micro",
+            "AllowedValues" : [ "t1.micro","m3.medium","m3.large"],
+            "ConstraintDescription" : "must be a valid EC2 instance type."
+        }
+    },
+
+    "Mappings": {
+        "AWSRegionToAMI": {
+            "us-east-1": {
+                "AMI": "ami-2f726546"
+            },
+            "us-west-2": {
+                "AMI": "ami-b8f69f88"
+            },
+            "us-west-1": {
+                "AMI": "ami-84f1cfc1"
+            },
+            "eu-west-1": {
+                "AMI": "ami-a921dfde"
+            },
+            "ap-southeast-1": {
+                "AMI": "ami-787c2c2a"
+            },
+            "ap-northeast-1": {
+                "AMI": "ami-a1bec3a0"
+            },
+            "ap-southeast-2": {
+                "AMI": "ami-0bc85031"
+            },
+            "sa-east-1": {
+                "AMI": "ami-89de7c94"
+            },
+            "us-gov-west-1": {
+                "AMI": "ami-433b5c60"
+            }
+        }
+    },
+
+    "Resources": {
+        "CFNCustomResourceAMIFinderQueue": {
+            "Type": "AWS::SQS::Queue"
+        },
+        "CFNCustomResourceAMIFinderTopic": {
+            "Type": "AWS::SNS::Topic",
+            "Properties": {
+                "Subscription": [
+                    {
+                        "Endpoint": {
+                            "Fn::GetAtt": ["CFNCustomResourceAMIFinderQueue", "Arn"]
+                        },
+                        "Protocol": "sqs"
+                    }
+                ]
+            }
+        },
+        "CFNCustomResourceRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version" : "2012-10-17",
+                    "Statement": [ {
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": [ "ec2.amazonaws.com" ]
+                        },
+                        "Action": [ "sts:AssumeRole" ]
+                    } ]
+                },
+                "Path": "/",
+                "Policies": [
+                    {
+                        "PolicyName": "QueueReaderPolicy",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "sqs:DeleteMessage",
+                                        "sqs:ReceiveMessage",
+                                        "sqs:ChangeMessageVisibility"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::GetAtt": ["CFNCustomResourceAMIFinderQueue", "Arn"]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+
+                    {
+                        "PolicyName": "DescribeImagePolicy",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "ec2:DescribeImages"
+                                    ],
+                                    "Resource": [
+                                        "*"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "CFNCustomResourceInstanceProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Path": "/",
+                "Roles": [ {
+                    "Ref": "CFNCustomResourceRole"
+                } ]
+            }
+        },
+        "TopicToQueuePolicy": {
+            "Type": "AWS::SQS::QueuePolicy",
+            "Properties": {
+                "PolicyDocument": {
+                    "Id": "TopicToQueuePolicy",
+                    "Statement": [
+                        {
+                            "Sid": "Allow-SendMessage-To-Queue-From-SNS-Topic",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "AWS": "*"
+                            },
+                            "Action": ["sqs:SendMessage"],
+                            "Resource": "*",
+                            "Condition": {
+                                "ArnEquals": {
+                                    "aws:SourceArn": {
+                                        "Ref": "CFNCustomResourceAMIFinderTopic"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                "Queues": [
+                    {
+                        "Ref": "CFNCustomResourceAMIFinderQueue"
+                    }
+                ]
+            }
+        },
+
+        "SecurityGroup" : {
+            "Type" : "AWS::EC2::SecurityGroup",
+            "Properties" : {
+                "GroupDescription" : "SSH to the instance",
+                "SecurityGroupIngress" : [
+                    {
+                        "CidrIp" : "0.0.0.0/0",
+                        "FromPort" : "22",
+                        "ToPort" : "22",
+                        "IpProtocol" : "tcp"
+                    }
+                ]
+            }
+        },
+
+        "Instance" : {
+            "Type" : "AWS::EC2::Instance",
+            "Properties" : {
+                "IamInstanceProfile" : { "Ref" : "CFNCustomResourceInstanceProfile" },
+                "ImageId" : { "Fn::FindInMap" : ["AWSRegionToAMI", { "Ref" : "AWS::Region" }, "AMI"] },
+                "InstanceType" : { "Ref" : "InstanceType" },
+                "KeyName" : { "Ref" : "KeyName" },
+                "SecurityGroups" : [ { "Ref" : "SecurityGroup" } ],
+                "UserData" : { "Fn::Base64" : { "Fn::Join" : ["", [
+                    "#!/bin/bash -x\n",
+                    "exec &> /home/ec2-user/userdata.log\n",
+                    "/opt/aws/bin/cfn-init --region ", { "Ref" : "AWS::Region" }, " -s ", { "Ref" : "AWS::StackId" }, " -r Instance -v\n",
+                    "/opt/aws/bin/cfn-signal -e $? ", { "Fn::Base64" : { "Ref" : "WaitConditionHandle" }}, "\n"
+                ]] } }
+
+            },
+            "Metadata" : {
+                "AWS::CloudFormation::Init" : {
+                    "config" : {
+                        "files" : {
+                            "/home/ec2-user/cfn-resource-bridge.conf" : {
+                                "source" : "https://raw.githubusercontent.com/sebsto/AMIFinder/master/sh/cfn-resource-bridge.conf",
+                                "context" : { "queue_url" : { "Ref": "CFNCustomResourceAMIFinderQueue" } }
+                            },
+                            "/home/ec2-user/create.sh" : {
+                                "source" : "https://raw.githubusercontent.com/sebsto/AMIFinder/master/sh/create.sh",
+                                "mode" : "000755",
+                                "owner" : "ec2-user"
+                            },
+                            "/home/ec2-user/update.sh" : {
+                                "source" : "https://raw.githubusercontent.com/sebsto/AMIFinder/master/sh/update.sh",
+                                "mode" : "000755",
+                                "owner" : "ec2-user"
+                            },
+                            "/home/ec2-user/delete.sh" : {
+                                "source" : "https://raw.githubusercontent.com/sebsto/AMIFinder/master/sh/delete.sh",
+                                "mode" : "000755",
+                                "owner" : "ec2-user"
+                            },
+                            "/home/ec2-user/findAMI.py" : {
+                                "source" : "https://raw.githubusercontent.com/sebsto/AMIFinder/master/findAMI.py",
+                                "mode" : "000755",
+                                "owner" : "ec2-user"
+                            }
+                        },
+                        "sources" : {
+                            "/home/ec2-user" : "https://raw.githubusercontent.com/sebsto/AMIFinder/master/sh/aws-cfn-resource-bridge-0.1.tar.gz"
+                        },
+                        "commands" : {
+                            "00_install_cfn_resource_bridge" : {
+                                "command" : "cd aws-cfn-resource-bridge-0.1 ; python setup.py install ; cd ..",
+                                "cwd" : "/home/ec2-user"
+                            },
+                            "10_run_cfn_resource_bridge" : {
+                                "command" : "cfn-resource-bridge -v -c /home/ec2-user",
+                                "cwd" : "/home/ec2-user"
+                            }
+
+                        }
+                    }
+                }
+            }
+        },
+
+
+        "WaitConditionHandle" : {
+            "Type" : "AWS::CloudFormation::WaitConditionHandle"
+        },
+
+        "WaitCondition" : {
+            "Type" : "AWS::CloudFormation::WaitCondition",
+            "DependsOn" : "Instance",
+            "Properties" : {
+                "Count" : "1",
+                "Handle" : { "Ref" : "WaitConditionHandle" },
+                "Timeout" : "600"
+            }
+        }
+    },
+    "Outputs": {
+        "CFNCustomResourceAMIFinderTopicARN": {
+            "Value": {
+                "Ref": "CFNCustomResourceAMIFinderTopic"
+            }
+        },
+        "CFNCustomResourceAMIFinderQueueInfo": {
+            "Value": {
+                "Fn::Join": [
+                    " ",
+                    [
+                        "ARN:", {
+                        "Fn::GetAtt": [ "CFNCustomResourceAMIFinderQueue", "Arn" ]
+                    },
+                        "URL:", {
+                        "Ref": "CFNCustomResourceAMIFinderQueue"
+                    }
+                    ]
+                ]
+            }
+        }
+    }
+}

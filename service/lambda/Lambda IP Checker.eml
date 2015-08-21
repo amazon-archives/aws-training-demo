@@ -1,0 +1,438 @@
+Received: from Ex10-hub-ue1e-2.ant.amazon.com (10.43.123.86) by
+ ex10-hub-12001.ant.amazon.com (10.32.58.112) with Microsoft SMTP Server (TLS)
+ id 14.3.181.6; Wed, 15 Jul 2015 17:07:40 -0700
+Received: from EX10-HUB-9002.ant.amazon.com (10.185.137.130) by
+ Ex10-hub-ue1e-2.ant.amazon.com (10.43.123.86) with Microsoft SMTP Server
+ (TLS) id 14.3.181.6; Wed, 15 Jul 2015 17:07:38 -0700
+Received: from email-inbound-relay-62001.pdx2.amazon.com (172.18.12.82) by
+ exchange.amazon.com (10.185.137.130) with Microsoft SMTP Server id
+ 14.3.181.6; Wed, 15 Jul 2015 17:07:36 -0700
+Received: from ex10-hub-31006.ant.amazon.com
+ (pdx1-ws-svc-lb16-vlan3.amazon.com [10.239.138.214])	by
+ email-inbound-relay-62001.pdx2.amazon.com (8.14.7/8.14.7) with ESMTP id
+ t6G07aMN012622	(version=TLSv1/SSLv3 cipher=AES256-SHA bits=256 verify=FAIL)
+	for <aws-technical-trainer-discussion@amazon.com>; Thu, 16 Jul 2015 00:07:36
+ GMT
+Received: from EX10-MBX-31003.ant.amazon.com ([fe80::5833:b3e6:f957:e42a]) by
+ ex10-hub-31006.ant.amazon.com ([::1]) with mapi id 14.03.0181.006; Wed, 15
+ Jul 2015 17:07:36 -0700
+From: "Sayers, Russell" <sayersr@amazon.com>
+To: AWS Trainers <aws-technical-trainer-discussion@amazon.com>
+Subject: Lambda IP Checker
+Thread-Topic: Lambda IP Checker
+Thread-Index: AQHQv1trDlMtS/75WUOY9yEvQtxFXA==
+Date: Thu, 16 Jul 2015 00:07:35 +0000
+Message-ID: <D1CC43D6.34864%sayersr@amazon.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: yes
+X-MS-TNEF-Correlator:
+user-agent: Microsoft-MacOutlook/14.5.0.150423
+x-originating-ip: [10.184.49.70]
+Content-Type: multipart/mixed;
+	boundary="_006_D1CC43D634864sayersramazoncom_"
+Precedence: Bulk
+Return-Path: aws-technical-trainer-discussion-approval@amazon.com
+X-MS-Exchange-Organization-AuthSource: ex10-hub-9002.ant.amazon.com
+X-MS-Exchange-Organization-AuthAs: Internal
+X-MS-Exchange-Organization-AuthMechanism: 10
+X-MS-Exchange-Organization-AVStamp-Mailbox: MSFTFF;1;0;0 0 0
+MIME-Version: 1.0
+
+--_006_D1CC43D634864sayersramazoncom_
+Content-Type: multipart/related;
+	boundary="_005_D1CC43D634864sayersramazoncom_";
+	type="multipart/alternative"
+
+--_005_D1CC43D634864sayersramazoncom_
+Content-Type: multipart/alternative;
+	boundary="_000_D1CC43D634864sayersramazoncom_"
+
+--_000_D1CC43D634864sayersramazoncom_
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
+
+Sharing something I coded recently to answer a question in the classroom.  =
+If you run the attached CloudFormation in US-EAST-1 or US-WEST-2 it will cr=
+eate a few things:
+
+  *   A dynamo db table called IPHistory
+  *   An SNS topic =93ip_changer_topic=94
+  *   A lambda function from the source code @ https://s3.amazonaws.com/say=
+ersr-us-east-1/ipchecker-lambda.zip.  This code enumerates all the EC2 inst=
+ances / names / public IP addresses in the region, and compares this to a h=
+istorical record in dynamodb table.  If anything has it posts a notificatio=
+n to the =93ip_changer_topic=94
+  *   An IAM role for the lambda function
+
+When you run the template you need to click the checkbox for =93I acknowled=
+ge that this template might cause AWS CloudFormation to create IAM resource=
+s=94 on the review screen.  When it has completed, goto Lambda, click =93te=
+st=94 on the function.  Now have a look at the contents of the dynamoDB tab=
+le =96 it will contain my JSON format of the instances / names / ipaddreses=
+.  Goto the SNS topic =93ip_changer_topic=94 and add your email address as =
+a subscriber.  The lambda function will now email you whenever =96 an insta=
+nce appears, an instance is removed, or a name or ip address is changed.
+
+Now to run it every 15 mins.  The writer of the Alestic blog has made a SNS=
+ topic available to run the lambda function every minutes: https://alestic.=
+com/2015/05/aws-lambda-recurring-schedule/.  Scroll down to =93Example: AWS=
+ Lambda Function=94 for instructions to have this lambda function run every=
+ 15 min.
+
+
+Russell Sayers
+Technical Trainer, AWS Training & Certification
+e: sayersr@amazon.com | p: 206.740.8277 | c: 206.724.3815
+
+[AWS-Training-Cert-Small]<http://aws.amazon.com/training/>
+
+
+
+
+--_000_D1CC43D634864sayersramazoncom_
+Content-Type: text/html; charset="Windows-1252"
+Content-ID: <D010A1263DEDF34D926BA7E6C97C4073@ant.amazon.com>
+Content-Transfer-Encoding: quoted-printable
+
+<html><head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DWindows-1=
+252">
+</head>
+<body style=3D"word-wrap: break-word; -webkit-nbsp-mode: space; -webkit-lin=
+e-break: after-white-space; color: rgb(0, 0, 0); font-size: 14px; font-fami=
+ly: Calibri, sans-serif;">
+<div>Sharing something I coded recently to answer a question in the classro=
+om. &nbsp;If you run the attached CloudFormation in US-EAST-1 or US-WEST-2 =
+it will create a few things:</div>
+<ul>
+<li>A dynamo db table called&nbsp;IPHistory</li><li>An SNS topic =93ip_chan=
+ger_topic=94</li><li><font face=3D"Calibri,sans-serif">A lambda function fr=
+om the source code @&nbsp;</font><a href=3D"https://s3.amazonaws.com/sayers=
+r-us-east-1/ipchecker-lambda.zip" style=3D"color: purple;">https://s3.amazo=
+naws.com/sayersr-us-east-1/ipchecker-lambda.zip</a>. &nbsp;This code
+ enumerates all the EC2 instances / names / public IP addresses in the regi=
+on, and compares this to a historical record in dynamodb table. &nbsp;If an=
+ything has it posts a notification to the&nbsp;=93ip_changer_topic=94</li><=
+li>An IAM role for the lambda function</li></ul>
+<div>When you run the template you need to click the checkbox for =93I ackn=
+owledge that this template might cause AWS CloudFormation to create IAM res=
+ources=94 on the review screen. &nbsp;When it has completed, goto Lambda, c=
+lick =93test=94 on the function. &nbsp;Now have a
+ look at the contents of the dynamoDB table =96 it will contain my JSON for=
+mat of the instances / names / ipaddreses. &nbsp;Goto the SNS topic =93ip_c=
+hanger_topic=94 and add your email address as a subscriber. &nbsp;The lambd=
+a function will now email you whenever =96 an instance
+ appears, an instance is removed, or a name or ip address is changed.</div>
+<div><br>
+</div>
+<div style=3D"font-family: Calibri; widows: 1;"><font face=3D"Calibri,sans-=
+serif">Now to run it every 15 mins. &nbsp;The writer of the Alestic blog ha=
+s made a SNS topic available to run the lambda function every minutes:&nbsp=
+;</font><a href=3D"https://alestic.com/2015/05/aws-lambda-recurring-schedul=
+e/" style=3D"color: rgb(0, 0, 0); font-family: Calibri, sans-serif;">https:=
+//alestic.com/2015/05/aws-lambda-recurring-schedule/</a><font face=3D"Calib=
+ri,sans-serif">.
+ &nbsp;Scroll down to =93Example: AWS Lambda Function</font><font face=3D"C=
+alibri,sans-serif"><span style=3D"line-height: 21.600000381469727px;">=94</=
+span><span style=3D"line-height: 21.6000003814697px;">&nbsp;for instruction=
+s to have this lambda function run every 15 min.</span></font></div>
+<div><br>
+</div>
+<div>
+<div><br>
+</div>
+<div>
+<p class=3D"MsoNormal" style=3D"margin: 0in 0in 0.0001pt; font-size: 11pt;"=
+><b><span style=3D"font-size: 9pt;">Russell Sayers<o:p></o:p></span></b></p=
+>
+<p class=3D"MsoNormal" style=3D"margin: 0in 0in 0.0001pt; font-size: 11pt;"=
+><span style=3D"font-size: 9pt;">Technical Trainer, AWS Training &amp; Cert=
+ification<o:p></o:p></span></p>
+<p class=3D"MsoNormal" style=3D"margin: 0in 0in 0.0001pt; font-size: 11pt;"=
+><span style=3D"font-size: 9pt;">e: sayersr@amazon.com&nbsp;</span><span st=
+yle=3D"font-size: 9pt;">| p: 206.740.8277 | c: 206.724.3815<o:p></o:p></spa=
+n></p>
+<p class=3D"MsoNormal" style=3D"margin: 0in 0in 0.0001pt; font-size: 11pt;"=
+><span style=3D"font-size: 9pt;">&nbsp;</span></p>
+<p class=3D"MsoNormal" style=3D"margin: 0in 0in 0.0001pt; font-size: 11pt;"=
+><a href=3D"http://aws.amazon.com/training/" style=3D"color: rgb(149, 79, 1=
+14);"><span style=3D"color: rgb(31, 73, 125); text-decoration: none;"><img =
+border=3D"0" width=3D"272" height=3D"70" id=3D"Picture_x0020_3" src=3D"cid:=
+E8EB8080-D61A-4146-A95D-40B4E8985ADD" alt=3D"AWS-Training-Cert-Small" type=
+=3D"image/png"></span></a><o:p></o:p></p>
+<p class=3D"MsoNormal" style=3D"margin: 0in 0in 0.0001pt; font-size: 11pt;"=
+><span style=3D"color: rgb(153, 51, 102);">&nbsp;</span></p>
+</div>
+<div>
+<p class=3D"MsoNormal" style=3D"margin: 0in 0in 0.0001pt; font-size: 11pt; =
+line-height: 17px;">
+<br>
+</p>
+<p class=3D"MsoNormal" style=3D"margin: 0in 0in 0.0001pt; font-size: 11pt; =
+line-height: 17px;">
+<b><span style=3D"font-size: 7pt; line-height: 10px; font-family: Verdana, =
+sans-serif; color: rgb(228, 121, 17);">&nbsp;</span></b></p>
+</div>
+</div>
+</body>
+</html>
+
+--_000_D1CC43D634864sayersramazoncom_--
+
+--_005_D1CC43D634864sayersramazoncom_
+Content-Type: image/png; name="1D7E2EA5-1C43-4AEB-866C-B4AD9D8B3F07[1].png"
+Content-Description: 1D7E2EA5-1C43-4AEB-866C-B4AD9D8B3F07[1].png
+Content-Disposition: inline;
+	filename="1D7E2EA5-1C43-4AEB-866C-B4AD9D8B3F07[1].png"; size=10462;
+	creation-date="Thu, 16 Jul 2015 00:07:35 GMT";
+	modification-date="Thu, 16 Jul 2015 00:07:35 GMT"
+Content-ID: <E8EB8080-D61A-4146-A95D-40B4E8985ADD>
+Content-Transfer-Encoding: base64
+
+iVBORw0KGgoAAAANSUhEUgAAARAAAABGCAYAAAAEqstLAAAKQWlDQ1BJQ0MgUHJvZmlsZQAASA2d
+lndUU9kWh8+9N73QEiIgJfQaegkg0jtIFQRRiUmAUAKGhCZ2RAVGFBEpVmRUwAFHhyJjRRQLg4Ji
+1wnyEFDGwVFEReXdjGsJ7601896a/cdZ39nnt9fZZ+9917oAUPyCBMJ0WAGANKFYFO7rwVwSE8vE
+9wIYEAEOWAHA4WZmBEf4RALU/L09mZmoSMaz9u4ugGS72yy/UCZz1v9/kSI3QyQGAApF1TY8fiYX
+5QKUU7PFGTL/BMr0lSkyhjEyFqEJoqwi48SvbPan5iu7yZiXJuShGlnOGbw0noy7UN6aJeGjjASh
+XJgl4GejfAdlvVRJmgDl9yjT0/icTAAwFJlfzOcmoWyJMkUUGe6J8gIACJTEObxyDov5OWieAHim
+Z+SKBIlJYqYR15hp5ejIZvrxs1P5YjErlMNN4Yh4TM/0tAyOMBeAr2+WRQElWW2ZaJHtrRzt7VnW
+5mj5v9nfHn5T/T3IevtV8Sbsz55BjJ5Z32zsrC+9FgD2JFqbHbO+lVUAtG0GQOXhrE/vIADyBQC0
+3pzzHoZsXpLE4gwnC4vs7GxzAZ9rLivoN/ufgm/Kv4Y595nL7vtWO6YXP4EjSRUzZUXlpqemS0TM
+zAwOl89k/fcQ/+PAOWnNycMsnJ/AF/GF6FVR6JQJhIlou4U8gViQLmQKhH/V4X8YNicHGX6daxRo
+dV8AfYU5ULhJB8hvPQBDIwMkbj96An3rWxAxCsi+vGitka9zjzJ6/uf6Hwtcim7hTEEiU+b2DI9k
+ciWiLBmj34RswQISkAd0oAo0gS4wAixgDRyAM3AD3iAAhIBIEAOWAy5IAmlABLJBPtgACkEx2AF2
+g2pwANSBetAEToI2cAZcBFfADXALDIBHQAqGwUswAd6BaQiC8BAVokGqkBakD5lC1hAbWgh5Q0FQ
+OBQDxUOJkBCSQPnQJqgYKoOqoUNQPfQjdBq6CF2D+qAH0CA0Bv0BfYQRmALTYQ3YALaA2bA7HAhH
+wsvgRHgVnAcXwNvhSrgWPg63whfhG/AALIVfwpMIQMgIA9FGWAgb8URCkFgkAREha5EipAKpRZqQ
+DqQbuY1IkXHkAwaHoWGYGBbGGeOHWYzhYlZh1mJKMNWYY5hWTBfmNmYQM4H5gqVi1bGmWCesP3YJ
+NhGbjS3EVmCPYFuwl7ED2GHsOxwOx8AZ4hxwfrgYXDJuNa4Etw/XjLuA68MN4SbxeLwq3hTvgg/B
+c/BifCG+Cn8cfx7fjx/GvyeQCVoEa4IPIZYgJGwkVBAaCOcI/YQRwjRRgahPdCKGEHnEXGIpsY7Y
+QbxJHCZOkxRJhiQXUiQpmbSBVElqIl0mPSa9IZPJOmRHchhZQF5PriSfIF8lD5I/UJQoJhRPShxF
+QtlOOUq5QHlAeUOlUg2obtRYqpi6nVpPvUR9Sn0vR5Mzl/OX48mtk6uRa5Xrl3slT5TXl3eXXy6f
+J18hf0r+pvy4AlHBQMFTgaOwVqFG4bTCPYVJRZqilWKIYppiiWKD4jXFUSW8koGStxJPqUDpsNIl
+pSEaQtOledK4tE20Otpl2jAdRzek+9OT6cX0H+i99AllJWVb5SjlHOUa5bPKUgbCMGD4M1IZpYyT
+jLuMj/M05rnP48/bNq9pXv+8KZX5Km4qfJUilWaVAZWPqkxVb9UU1Z2qbapP1DBqJmphatlq+9Uu
+q43Pp893ns+dXzT/5PyH6rC6iXq4+mr1w+o96pMamhq+GhkaVRqXNMY1GZpumsma5ZrnNMe0aFoL
+tQRa5VrntV4wlZnuzFRmJbOLOaGtru2nLdE+pN2rPa1jqLNYZ6NOs84TXZIuWzdBt1y3U3dCT0sv
+WC9fr1HvoT5Rn62fpL9Hv1t/ysDQINpgi0GbwaihiqG/YZ5ho+FjI6qRq9Eqo1qjO8Y4Y7ZxivE+
+41smsImdSZJJjclNU9jU3lRgus+0zwxr5mgmNKs1u8eisNxZWaxG1qA5wzzIfKN5m/krCz2LWIud
+Ft0WXyztLFMt6ywfWSlZBVhttOqw+sPaxJprXWN9x4Zq42Ozzqbd5rWtqS3fdr/tfTuaXbDdFrtO
+u8/2DvYi+yb7MQc9h3iHvQ732HR2KLuEfdUR6+jhuM7xjOMHJ3snsdNJp9+dWc4pzg3OowsMF/AX
+1C0YctFx4bgccpEuZC6MX3hwodRV25XjWuv6zE3Xjed2xG3E3dg92f24+ysPSw+RR4vHlKeT5xrP
+C16Il69XkVevt5L3Yu9q76c+Oj6JPo0+E752vqt9L/hh/QL9dvrd89fw5/rX+08EOASsCegKpARG
+BFYHPgsyCRIFdQTDwQHBu4IfL9JfJFzUFgJC/EN2hTwJNQxdFfpzGC4sNKwm7Hm4VXh+eHcELWJF
+REPEu0iPyNLIR4uNFksWd0bJR8VF1UdNRXtFl0VLl1gsWbPkRoxajCCmPRYfGxV7JHZyqffS3UuH
+4+ziCuPuLjNclrPs2nK15anLz66QX8FZcSoeGx8d3xD/iRPCqeVMrvRfuXflBNeTu4f7kufGK+eN
+8V34ZfyRBJeEsoTRRJfEXYljSa5JFUnjAk9BteB1sl/ygeSplJCUoykzqdGpzWmEtPi000IlYYqw
+K10zPSe9L8M0ozBDuspp1e5VE6JA0ZFMKHNZZruYjv5M9UiMJJslg1kLs2qy3mdHZZ/KUcwR5vTk
+muRuyx3J88n7fjVmNXd1Z752/ob8wTXuaw6thdauXNu5Tnddwbrh9b7rj20gbUjZ8MtGy41lG99u
+it7UUaBRsL5gaLPv5sZCuUJR4b0tzlsObMVsFWzt3WazrWrblyJe0fViy+KK4k8l3JLr31l9V/nd
+zPaE7b2l9qX7d+B2CHfc3em681iZYlle2dCu4F2t5czyovK3u1fsvlZhW3FgD2mPZI+0MqiyvUqv
+akfVp+qk6oEaj5rmvep7t+2d2sfb17/fbX/TAY0DxQc+HhQcvH/I91BrrUFtxWHc4azDz+ui6rq/
+Z39ff0TtSPGRz0eFR6XHwo911TvU1zeoN5Q2wo2SxrHjccdv/eD1Q3sTq+lQM6O5+AQ4ITnx4sf4
+H++eDDzZeYp9qukn/Z/2ttBailqh1tzWibakNml7THvf6YDTnR3OHS0/m/989Iz2mZqzymdLz5HO
+FZybOZ93fvJCxoXxi4kXhzpXdD66tOTSna6wrt7LgZevXvG5cqnbvfv8VZerZ645XTt9nX297Yb9
+jdYeu56WX+x+aem172296XCz/ZbjrY6+BX3n+l37L972un3ljv+dGwOLBvruLr57/17cPel93v3R
+B6kPXj/Mejj9aP1j7OOiJwpPKp6qP6391fjXZqm99Oyg12DPs4hnj4a4Qy//lfmvT8MFz6nPK0a0
+RupHrUfPjPmM3Xqx9MXwy4yX0+OFvyn+tveV0auffnf7vWdiycTwa9HrmT9K3qi+OfrW9m3nZOjk
+03dp76anit6rvj/2gf2h+2P0x5Hp7E/4T5WfjT93fAn88ngmbWbm3/eE8/syOll+AAAeWElEQVR4
+Ae2dCbhd47mAJWIMYh4jjqBqnmJszYlZJVRaiioxV1FSrqpeY5OrLhc1pAPFNSQ3NYQo0QiN0hpK
+lZh7jDHGEESI5L7vOuvf/c86aw9nyjknZ33P8+5/nr79f9/61zp779Njzpw58xVSaKDQQKGBlmig
+Z0saFW0KDRQaKDSgBgoHUuyDQgOFBlqsgV5xyx49esTJDo/PvHHztZnEEBgM68Ef4Va4c6EDHvmQ
+sFlCfyvRYB+wv+3gQbC/2+jvdcJCCg0UGog0UO0RR4+4Qkc7EAxcD7Yp6DT2hXUgT2aROQmqGj99
+rkG90N9WxMt5yUfT/m7FmTxNvJBCA91eA7F/yFNGp3EgGLq3U0fD4bAJlDN0ikoyg9gDcD5Gb9hI
+6HNPMk6Bb8ACjQrzE1+R/Te4gv6uy69S5BYa6D4a6BIOBEPfkbfkGYz2bd8a0ssS7Ay7wCBYFZTZ
+8DhMgHvhQdrMJLTNuoaknyG+BdH3ib9kHuneBNuDfYm3Q0GeJ2J/Mok2H1lAm74EfUk/bLqQQgPd
+UQNdxYFM4s3xmYRX/3FwB4b7JGEiGLPPQmQy+dPMJM8ThW32TulPeBLlF1N2MfETYArcAfb5F8o8
+Ydh2ZYLN4XHyXkvzPPEMgL3gW7Ax/J7yQwkLKTTQLTVQzYE0eojawRrSgLdMORcjf5V4MP77MOTn
+yFsGDiZfp7ErLAGVxGcoMhym0XY8oc7kbvq7jfSi4ENVnYasCIUUGig0UKMGetZYryOq9WPQY+Eu
+OCCdwIWE18L+UM15pE1KwdLEDoKb4aw090hCH8QOg8J5pEopgkIDtWqgMzuQWtdQ1Cs0UGiggzRQ
+OJAOUnwxbKGBeUEDhQOZF97FrrEG/9K2aNeYajHLWjVQOJBaNVXUa60GLqKD5VvbSdG+c2mgcCCd
+6/0oZlNooEtpoHAgXertKiZbaKBzaaCrOJDiR0s6174pZlNoINFAV3EgycfLi/es0EChgc6lgc7i
+QEahlsnQ0pPGp7T1A2J/AuUW8FOsX5hogfht37vhpha0LZoUGug2GugUH2XnY+U3oPEb+Fi531H5
+NhwIfqy9knxOoR9L13GMp48ZoTLx+4nfT399CP1ey1DYDSqt1y/qTQKdxlj6mEZYSKGBQgMVNFDJ
+oErNMMTVSfj7HINhfvDj3/5uxvOEzRb6W5ZGfgfF/upAR2Cfj9DnJYSXUMePsvuRdQknE53GH2AM
++IW7TwjLCuXe+vi1/Ovoz4+yDwH7+xIUncYDcCP8gfrvEBZSaKDQQI0aKPt7IBjcBvSh09DoNirT
+3xTyE2dCqPEHQ29SPXUI9iXbQt7t05vk3wb26RfoEkOnbQ/7JuxJqNG3SkI/IWxVZ0XjWjXwBBUH
+Q32tDYp6Ha+Bat/GbeJAMCqv1OfBobAw1CIa+lgYjoG/HjegP792PxxOBvuuVbwN8ev5f6+1QVGv
+U2ugcCCd+u3Jn1yzHMgXN22xAQb7lF1h+DoPTwr+AI9sDLE8TcIf9fGHeO6nXXI7Qbs1SE8l/Rnx
+dYk/R/wr4t76bAZ+DX8gbA06lyCvEbEv+7yXNu9aQLvlCBYk/YbpHFmGPL9V61f8PTUtBt7qPAN3
+wBXwFsTiN3nPgAXTzImEt8N+cDisCe+BtzaXw1fg/IfBt2FVcD7/C9dAuVPRJpQdA9tDf+gFrutx
+uA583mLfsXydxNFxRoW4fTyWKfe5z6GwB6wG08FbTec6HrLic6cfg3NTvEX0ts5bPedhH97amf8/
+kJwKCZsrNTmQfqv0PZWOR9TY+cuvvvH6GjXWbVQtjEP7Ho0KqiRo5yn7NNqNrFK1SxeHdb7y+msV
+1xk2TVjsPzDYV0iMS9ExaNQa8vIEA8E2E8ifSmj+/ATbEGrA/qbGOrA61MMN0JeyOwk1Zn+H42+E
+55Cnoe8Iq8BE8kvPUyjbAI4g3/62gsPgGsjKDmT4PGTZTMHCpDdN+RHh7vAwBNGYh4cEYR18DS6A
+IGsR0cmtD8fAWPC5TZC1iewEe4JOxY0VpAcRFR+PEcqWI7Jrio7PuX0GQVzvCSFRJaynPHYgW5K+
+FVaEWAaQOBC8PTSMx9uC9MkQi3mxLjRSdbEbOPes0yOrzcQLyFGZ3vYn7d7L5n+QqVck57IGsg7E
+4b3i/DDlEwz5HuI6FH8JXYeg0+gDQ4nqNLzSVbo1WYbyQ1Jm0c6rW+Kg6M/Q/hYCN6f9aZDOoZro
+BHRKvatUXJLy0bAmfFGmbl/yzytTppHPgth5xFX3JTEYbokyTyKe5zyiKkl0O17PhlOyBS1Ia+S+
+V0tUaOsabgb1XE5WoiBrqKHuzkR8328MGW0dcmXXIUpJuBpuZoKyUaXM1kfG0EWjcWrschD1Xq6x
+7jxfrWeVFXpK0ECuhrcx8j5pfRXoRjwIKjmPtHop0GHtBBfBi/S3bVoynvAuOBbynMfstF4cnEEi
+dh7Pkj4YPNVcD7GsSkJjLSdu0AXLFZLvvCqJawri6efnIZGGGpwbbz94Ls0LgTqMxfJJcH+GmaSz
+Ep+qLqMwdh72cxicDjMgiKc6nUA5cY6uYU6ZCjr6Li84I29/7m3uQmxj2+a2m1fr551Ayq3VY7ko
+3ra0hYR+Qliuz49zCnaJ8tzsXlVfTPMeINSoV07TBv2jeF7UE8Qw0CHq0LyFicVTzIngicaTT9yf
+DirI1kRiQ36I9IGhkPAjiDfuCqQ12M9Bsb5OMJYhJLaPM4hfDsGBrEs8NuyvSHtr9C9QdCA67SCe
+jlxPnvhe6Ly+De4Pb2G9jQuydoh0dJjep+sMNegR4IXAtCeLU8FbH9+nD0Cd++wiMX7aWj6CdLKn
+wz0/eaHtQOKh3VHUMz5fqEd6ZOiDbPdMPJ59jKJOoxMT9T3NivN0Hp6CRsI0qPpchfbOyXFsvxQ0
+GSfMLy2zbu46yE8kb07M+7RQXi3sWa1CJy7flbl9Fzz+HwfBeRBNHmq+YCSSRaN4XlRl+0baz1WZ
+Cl+SHgZTYQpcD+VkMgWeNg6DM+FkiOWlOJHGdSDlZHkKGm1E0q4tvkXaL9NYJxSch0W3Z8oHkI4d
+YKY4eebzHplvgY4qFjduZxKNSSfnvNSThqlz1HmY9r3QIFzvoxhMpfnbxrY6G9tp3Brgo1BJHN95
+OE5waFelxpm0I66Dc181t+/Q3nk4jo7sKHB+9uU47t1YaloH7VxrkzmR7zg1Sa+aanXOSk8zLQni
+7cx6sDp4IjCsVWZSUccR5NUQSUM35fQo750ono1+SYZvbCyrkFgHnFd8NY/rlIv/hoJlo0JPFwfD
+Z1GeDiEWnVwsOhPXuFCUuQVx15UV1xa3z9aJ+8i27Yi0xlO6erP5NTQZwJXUK3Qi5PuevAQaV9Yh
+J3V40QnE7e6lXeKQ7Jf+su9raOftkI4jyBjq63Q8bYyyLaHz9CQTj21ZNedEs0R0QN4+xeM4Px2i
+4+jsglRdB+3UgwzKrKs5c8r9MFeYRFcIPW4Pgz+Dtzl/hZvgAugHtcrnVJwTVdYJxGJ5LNnyuCzE
+VyTyS3gFXocJ8Dv4MdQqnmL2zlQ+n7TrjGW1OEE8di4WubYPjURS7gSSdY46ns4sj2EAsfFoUGPI
+KzkPJ086OMJKJxANtFE7mganoVGWk3j8UMd2oY3OQycTO49QL69tKItD559X1xNJ9r2sZR06HXUX
+1hePlTdOXF6K9yrFul7E5wzjYLucqbvpXVu1Zyuh6fQQqTFctEq9bSm/DfI266fke1qqJp6gLs5U
+cnOfk8kz6XOZWPIcXNYJZtuE9p5wupI0MgAMYgyT9wSg7jVgjcv4QKgmjfqyMv19QF8V21En63Ss
+nzwzSRs6D+eVJ03GzKvEGMnJg7m4HvtzTcZ1BFlp0mfOOlo9JwftmR25C6WvYK6x8/ANOxqWg4Vh
+MtQqbWk0jn8rxM7DZxJuYI//tdzC+L5cA4tDkBlEDoI85/BJqJSGC2TSecmsQ8mr0xXyYkP1IedS
+MJqJ+zzLU59Xf42liVGRN7fEvRBOQI3G1LAbZZRJsKaB4C2YXAU6DvvNc15kV5VWz8kRvEp3Ralj
+0gdmJq5xjY/yFoniczPqG+tT+SBvENF5hNuKWk5F3ubEztG+NIRnjeTI2+StF+V7OstK9tQzNVth
+HklrXOrbK7ZH+ZKBYoA+R+gIcQ7xBaU0B+aUm1+qQIQ6OkCdoaeYoayp5DQoc1+43uZKq+YUBuuq
+DmSbsIA0/ILwrkzeKpn03HIo38yMew/p4DwsWjVTbtKTxodpvieU89J4CDwtrAg/gefBZz7vQ5DH
+iewUEoRfi+JG3aTxg1jzbDMvig8GR2JkjW4ZMDSP+x0lGnw5Iy+XH8811Cn9OTkqbOm6WjunZAoe
+lWO5noQPI1sqbnTfuOD1/0C8NVe62bSfCM9BLMvECeIe2WMHsQPprAPZgry5IX0yg+gcYvGklJXN
+o4yLiC8YpY16S3Y6jIRb4N00DLdDWee5JeWxw9iDdCy+J26geVHce3lXda/UHSXaxGY4MZ1bVpoz
+r0brSp2iJ96WyCgaOafgnOI+ap5Tr7gVHy0/2I+Vk7cXuFjD3lBJvqDwDlBJjX6jg/7Opr9zyf8G
+HAj7wXJQSfyLgVfYG6Hcb3RknVIP6p4N/wnrwjWQlX3I2Boeyha0cfqdTH/fIu2b9BcYBodDVs4i
+406YCR5Xq4nrHQw6zd1gErwAa4HSC9wgPwQfxup4YrmcxKw4Yx6Ku+5TMQwdyb3gFToYrs8hNJpa
+dEzVthFOQ/5p1DmMJvS9cF46Aw3VeVaTZE1UCu1t457SeWh3+9t/9tRFflmxLm1sOyGak7qyT/tX
+V1XFjdZIMHo38VjB+N2gXr1c/D4QxDo6jdFwO20+soD6C8PeRN3cnhJ8mDiOch3CnylzQ+8A9rcv
+BNFpTAb789fA3gwFZcJJ5Hva8coc5GQiUk40uqOgvR3I3YwR62pB0hOgkqxP4XZgvZ6VKmbKwvpn
+k/8juCsqH0JcsvI8Gb/MZs4raQzjNAxCA9AQNFANQUPRcOM868w1YV6DmJfzce8Hx6FjcF7ToKzQ
+1r8EDaLCCLgqregJcigYavh+oEzHVLPQ71DaqJNYL36C1k/Z+rC2uvh9/0Cl2hj/YjC/dQgXD3WJ
++8W6A2A0+OU7f/gnxq/yT4IToS5qNz/pRU0T9gn5zQh/Sl0dTx6fkr8nTIzKJxFfEpSNIW5Xb2Yk
+OsC4/ImozOiJmfJbo3Kd7t8z5XFfj1L2TXCOIf8U4kE+JDILdAYnwU6wMWwCrsl16wRtOwliGU4i
+9JkXvkL5mnED4oMzbZ7IlO+QKa/PlNeatN+6WivPS/Uwxv6Qe+pJy+YQ6lg6nQTfUC5scgIptwJO
+BZ+EMuLTMfrepM+EE2ChUJYTekXdPuUi2mkYJ9KHV8LPYD7iHxk2U86j/lTQaL6etrUfT0bOyyvP
+3+BOmAJHwBegvAuOH+b9pJmR1BPXAwf96OVjsb968FSjPNMQJK8zeNXoz4fvwFKgON7VcBF4grPs
+CtB53AxBjibyEGjsWdExuR7XviGsALFcQMI6Z8E2UcF7xK+DcyF7tasnL16r7WNRxy/CAmmmOi2k
+eRrQOYzASazB1d19GYtXfyW7xxpyO/lrk18kq2W+OIFlMXo3pacHN/FA2CUNVyaM5VMS94HHK38o
+6GkLaefxe37SlrdW7EtjntHajtqh/RL0qaP0VDE3xdNdP5gOOoHZ0JHiCcTTTn1HTqIjxsZxeBHx
+5KmMAp2FeToW8a9GpxF2OvHkUUla6kC8inlVGic4gdKxF8ewHnk6kyVBp/Ew5V8S6jT8U+SesDcM
+Mk7ZJMLOIs5tQbils0yoyjy2o/xKuBwuq1K3o4u7rQNR8akTOZWoF1tvZz4AHYkfu9epdEppLwfy
+IavtE634deI6E28f/HUxH3DqMDwVbAx7gU5jAJgXZMdO5kDCuuI5hrl2xtBbmdPhAfA2sTNLixxI
+ange871S9wev3BqeFycf+GVvCchuW2EOGn7pq//2nuY5L+fkvvaEUfpSH/F2Fcb3aNDu41VzID3b
+aJV96ecYuBPex3GE25iJpB+Hs2Fz6CqGyVS7hFzILHUgx3aJ2TZzkhiJxqlhjgAdhcf8o0AHovH6
+9Xyv6G0qGifoNHIlHdM5eXLwJN2uTsy5OKfcyXRwZq92GN97b28DlPAAsSHVdq86KJ93eAwM4lg6
+xPdDBqF/EVkGPCEFWYxIHfiBuVehnKxNQT+YAnH7bH2fv9TBR/A2zIY88ROojl0Pzr2ceLL7BLzd
+Wwv+AdkHnxuQpzh/55ftbwHyVoNPYSrkSW8yreOp6828CuQtDcuD64p1TbJ9BYMJzsNxmzx8pFxn
+Mhr8HEP8Ffz2mNgYOtVpBfEWxC/ajQwZzKHdHUkYKw3n9niZ4RuSGlxXEw32NXgBYgfoEdm/JgTn
+RXS+34JGprEsBJeCDuYpeAU8Ha0PWfk1Gc/CPWD7yyCrKx3l72E6aMQaoXX3g1i2JvFPsMy/1rwL
+50APUPYE5267iaBBnw2Hw33wK4hlBRLW97nHYLgFfgZBbKfTUD/O6WFYA4Kon4vhPXga3oBHINaD
+cfPUlWvTgU2GuB+S7Spe4RV/r6LJFZ48HctRSY2Gz1Wk0bYPHB+8ZSorlluvbIU2Lpjb45WbfmyA
+5ep0tvzPmZBGsQ1sCQ/CWtAPlG+Ahjc/7A4am1fi6+F78Fe4BNaDU+FPsA7EV/nvkz4dXoPz4TjQ
+4VwAQcw/BOxPR9Ifjgevit4T/x3WBftXz+fAi3AinAGu4zxw7hvB1bA46Lg8dehszoI9Qefnn36V
+b0FPGAfBCYXQst/Ax2DfdeCadYQ6hRkwClyf89Y5OcfhEPTgScq+68C6j8EesA+MB/U2C9pN0tPH
+/gzgXyfKGqVl1HWOm8WTSdvrgAam+a7B5wWGiVBnDpGhYP/WtY/4xOyfXc23/1BnEPEJkEjahyeR
+Hmm89EyCtH2FObg37GMMuCadXyLUc47uwzC+c0x+DjEtazIe5Tryl6A0HnGfy6iz0JdjhPFKOqSO
+6z4NHMe6jm/deyHvuzZklxc3YleUu9NJhw2yc7SIXdP4loRLgm+ABq0hvQHWvQF+ChfC8nAsxGLZ
+L+B6OCgtOIkw1lcYR2O8AjTCQ+ARCBvRDbQI/ATOhGvBdp+Cb6JlQRYn8iNYB26Gp+A5MH8XCDIk
+jYwNGVGok1I0jDPAuV8NbmCdy6bgfN8E9XAd/AfEetCh1YHjHwUa0GD4DfwLekN7S3hfNYCKgjG6
+6X1/E8FAXOujYOj8RfFWRyONxbT7w/fLddqPTkIxbXykiVQeIzTPMsV4qJ9k+JLOQQN3HbYPbY4k
+PhoSoZ7ljq8BO0/r3QvhZwpzx2O9JYdA3UToy71m37a3H/eX6/M5kbqIRUcT13WOzkW9NUt6Nat2
+56n8R6ZyFqgoQxf/FSi7gcozVO6BfZNYQ3w54qJo7Ir9nJvEGl40uiAPEPENXgnWhOdBmdYQJI5I
+B+KpwTclbJBFiO8Oyn1QZySVxwm3ha1CBqGb5dIobVQDOgM04HGwOGj4T4Ib1D6CrExkQ9A5uOYg
+FxOpg1lQTg9/pUzRUf02iTU4shOI25drPiLNnxtB2PBNDKWGwa+iju+Xtz6Git/70FAtKzkb4l6B
+G13FSesADEq3LWk6+XEh8v0ZQQ3TtMaaJ2EOPpsJc7Cd9TXoI8kfRVyj99ZHhx+k9DOF5GvYVcej
+P/e/a2n0k4nku3/Cut3jQZx//NzIMdS137Wp9NONoX0p7FmKda2InlID1gA9ZewI5v0FNoIVYVf4
+HB6EtUD5AXgVDYQr3KoWRvJeFDf6dJpeOco/n/iXcDA47sfwBJwAPWB16AWK+WFMw2D4q1mYyqQQ
+icLgjDx1zA97wIIwFrLieIrGPieJNbzo2HYC23ytIWu+Qwnj+YT++pE/FS4H567zeQZc292wPcwN
+8UQQDLbm8dj8Oh6NSacQDDe01xj9Il1wTuZnfw4x1G1xSP8aZ+4cmNNjlOk4kvURarTOKyvOPZ5n
+tjyb1nk0+cnEVAf2748RJU4vbVjLTx5mx8hNhw2eW9iJM2czt3vgu6DBLg1/gs9A4zwANgc9vk5E
+g1Y8KdguK29lM8qkdRhB7iSyPhwEO8AmsBFodIvBraB8BIcayZEHyDskzf8kp/wp8p6DtWEHGAxK
+MPiGVMNrzzhRJh70cCXlOoSsvJNmHEd4BwyBrWBd2AV2hE3hn9Cekhg/m36pHEdQaVwNV8k7GWi8
+inU0YiWvXkNJy1+Doeb2zXq8VUmEeHLySJ2a7XQs/eHIpELtL7YNF8NsqzAP6wQdhLxSXfXMPErp
+WiNd1YG4Pg1AB3KKCeQ+8FRyLpwBGovHN6U+eW0w5mDYZllH43jBRCReiV9N09bRUSjPNwTJ6+K8
+anBnpnmeEI6Hi+AHcCno6HqDzm06BFmRiAbvfKuJG8P1HAh7gA7FU0FW6tMM1xPLliQuh/+GelA+
+hEp6cH5usrtAcWNfC3vB92E4tKe8nHauMYVNnzsem15j8wo8AJynMq2CMYQ61ksclZE2lKT/Whwf
+c9SZXQWu07m4btcrltUqjhl01qhN5BjidTeq05qEm7glorHOaknDqI1XsTejdHOj4STh1X4mTIYn
+4F3wRKIEB+JpQdEI+ySxhpcTCJzHhVGe0dJVgvgQWBIeAvtWlgPfcMdcBJSvIBjlAsQ99lveCw6H
+II5vX2+A/VST0WkFDXcJ+L8yDV4jfwosD54WgmhcnhpmwPg0M6uH48lXDzqZI2AqnAdBXOvENOF6
+2lt0Xsr+DUHFV+tkTyqDyCuHDrk9RV35HCXXYM1P8UTg/tRZ+DxiaTB074X1E61JHFMn1ESieSTz
+alKhlRkt2gx8/HwInzbVSIeCb+AOUIszeoZ6N8EY+niWsDWi8/kHbAgPw+egeDI5CDT2J0HR4d0B
+XkF1Mr+D1UGj1LCugCAa/umwNjjGYTAbzoQg9m2fA8ExboAv4GBQxjYEycPc+4lrmBrxFLBOHVwL
+wSERLStPUeKpw/kotzQEua9nkat+dTqjYC0YDE/D7aDTD3pw4/4e+sIwCHr4kPhHMBw8zTj/FcCN
+rYS1NaTa4RUj8s+zGvqRhGU/rk5Zf+r4HoTnCK5J+YA+QjzJSA1JvVj35SSzfV7CuM7LNWRFp+H4
+oV7en05dV3PEvhwvT0J+GC+vTovzera0JQ5gGlwJO9PHSnAMTITZEIub/1zYkLrrwTnQWucR+r8r
+jdwTMghDno5kTpT/HeK/hZXhbPgBeNVVwTo2RYf0PfgF7A7Hw9vwXcheFfYjz/5WhZ+DV2zjl8Jp
+oDwEOq2X4GA4H1aHS+AIUHQ8isZdTnQKyosQb4SwvqDzmyn/IZjWAeg8HoQ9IPSvHq4G56oejgTX
+Pwh0NG/A9jAZ9oT/gpNhGqgb8+eGBB3659cmBpXmaYxeWUc6IZyG79HLcKrpjJjnex3rL1Ol9cnU
+cTkPP0fS6BRC2vE3g9ixZOu4Vt+T5ojr9zdHGrVLx3fdeQ9Nm9N/2bq9ypY0owCH8A7Vr5T0ezBu
+NmUIZf9qiLbLqwagcU2JeteIdAyvRnlGP4NhcCL0A+f4FsSyXZrwKv0zWAQ+SfOywcdk2N9xUAcz
+QeP7EmLRua0FdbAY6ExmQJBfExkP2bmEcsPz4BrwZBDLWBKvwPNR5q+Ij4LVYDq8DbGoh8PgBFAP
+rsPbn1ieJLEtuLm9OLwP2X7Iaj9JTyEDGEEn8RLGoNFpmIpGuH8S4xRM3fh47klJp2M79WCZdTWu
+vKs92U3ENv7lQmcT992kYpkM5/Co0MdIQp2azsM5+O3b8H9rNO5afqYwmQN92b7052XiidCff4Z1
+HD8/ogNST4bWN1SP7SI927pXHMab8Ln9trPzcAiN4QnQeIN8RcSThEfxPNEhPAOVDNZ29lPOeVge
+xLGfg3rIOg+ySlJP7J8QOw8LbVMPic4I8yTUyW5m5zcJ3sw0sv6LUMnodS6eOLLOg6ySOJ66qtRP
+qXJbR3Qi9DkAPI1oCCPgKtCB6Bz8jkxwKiRLpxDbKNb1tsW2Ohrb1CI6ANtMgOCoammX1EnnvQYJ
+56aTsB8diJ9CHUoY/kQ9iKg6DvN0XZY7vs5Lh6ATD84zqZfmkf1voV91ZFvHcTx1ZR8+V1GP7SPx
+T5W1zwhFr4UGEg3o6OsKXXQtDcT+IS/e5ieQrqWeYraFBgoNtEYDhQNpjfaKtoUGurkGCgfSzTdA
+sfxCA63RQOFAWqO9om2hgW6ugcKBdPMNUCy/0EBrNFA4kNZor2hbaKCba6BwIN18AxTLLzTQGg0U
+DqQ12ivaFhro5hooHEg33wDF8gsNtEYDhQNpjfaKtoUGurkGGv1ry26ui2L5hQYKDTRTA8UJpJkK
+K6oXGig08G8N/D9W5pgjUtjdEwAAAABJRU5ErkJggg==
+
+--_005_D1CC43D634864sayersramazoncom_--
+
+--_006_D1CC43D634864sayersramazoncom_
+Content-Type: application/x-iwork-pages-sfftemplate;
+	name="IPChanger.template"
+Content-Description: IPChanger.template
+Content-Disposition: attachment; filename="IPChanger.template"; size=2675;
+	creation-date="Thu, 16 Jul 2015 00:07:35 GMT";
+	modification-date="Thu, 16 Jul 2015 00:07:35 GMT"
+Content-ID: <3171A2723529B94B850C341C4BF849C6@ant.amazon.com>
+Content-Transfer-Encoding: base64
+
+ewogICJBV1NUZW1wbGF0ZUZvcm1hdFZlcnNpb24iOiAiMjAxMC0wOS0wOSIsCiAgIlJlc291cmNl
+cyI6IHsKICAgICJJUEhpc3RvcnlUYWJsZSI6IHsKICAgICAgIlR5cGUiOiAiQVdTOjpEeW5hbW9E
+Qjo6VGFibGUiLAogICAgICAiUHJvcGVydGllcyI6IHsKICAgICAgICAiQXR0cmlidXRlRGVmaW5p
+dGlvbnMiOiBbewogICAgICAgICAgIkF0dHJpYnV0ZU5hbWUiOiAiSWQiLAogICAgICAgICAgIkF0
+dHJpYnV0ZVR5cGUiOiAiUyIKICAgICAgICB9XSwKICAgICAgICAiS2V5U2NoZW1hIjogW3sKICAg
+ICAgICAgICJBdHRyaWJ1dGVOYW1lIjogIklkIiwKICAgICAgICAgICJLZXlUeXBlIjogIkhBU0gi
+CiAgICAgICAgfV0sCiAgICAgICAgIlByb3Zpc2lvbmVkVGhyb3VnaHB1dCI6IHsKICAgICAgICAg
+ICJSZWFkQ2FwYWNpdHlVbml0cyI6ICIxIiwKICAgICAgICAgICJXcml0ZUNhcGFjaXR5VW5pdHMi
+OiAiMSIKICAgICAgICB9LAogICAgICAgICJUYWJsZU5hbWUiOiAiSVBIaXN0b3J5IgogICAgICB9
+CiAgICB9LAoKICAgICJMYW1iZGFFeGVjdXRpb25Sb2xlIjogewogICAgICAiVHlwZSI6ICJBV1M6
+OklBTTo6Um9sZSIsCiAgICAgICJQcm9wZXJ0aWVzIjogewogICAgICAgICJBc3N1bWVSb2xlUG9s
+aWN5RG9jdW1lbnQiOiB7CiAgICAgICAgICAiVmVyc2lvbiI6ICIyMDEyLTEwLTE3IiwKICAgICAg
+ICAgICJTdGF0ZW1lbnQiOiBbewogICAgICAgICAgICAiRWZmZWN0IjogIkFsbG93IiwKICAgICAg
+ICAgICAgIlByaW5jaXBhbCI6IHsKICAgICAgICAgICAgICAiU2VydmljZSI6ICJsYW1iZGEuYW1h
+em9uYXdzLmNvbSIKICAgICAgICAgICAgfSwKICAgICAgICAgICAgIkFjdGlvbiI6IFsic3RzOkFz
+c3VtZVJvbGUiXQogICAgICAgICAgfV0KICAgICAgICB9LAogICAgICAgICJQYXRoIjogIi8iLAog
+ICAgICAgICJQb2xpY2llcyI6IFt7CiAgICAgICAgICAiUG9saWN5TmFtZSI6ICJJUENoZWNrZXJQ
+b2xpY3kiLAogICAgICAgICAgIlBvbGljeURvY3VtZW50IjogewogICAgICAgICAgICAiVmVyc2lv
+biI6ICIyMDEyLTEwLTE3IiwKICAgICAgICAgICAgIlN0YXRlbWVudCI6IFt7CiAgICAgICAgICAg
+ICAgIkVmZmVjdCI6ICJBbGxvdyIsCiAgICAgICAgICAgICAgIkFjdGlvbiI6ICJlYzI6RGVzY3Jp
+YmUqIiwKICAgICAgICAgICAgICAiUmVzb3VyY2UiOiAiKiIKICAgICAgICAgICAgfSwgewogICAg
+ICAgICAgICAgICJFZmZlY3QiOiAiQWxsb3ciLAogICAgICAgICAgICAgICJBY3Rpb24iOiBbCiAg
+ICAgICAgICAgICAgICAibG9nczpDcmVhdGVMb2dHcm91cCIsCiAgICAgICAgICAgICAgICAibG9n
+czpDcmVhdGVMb2dTdHJlYW0iLAogICAgICAgICAgICAgICAgImxvZ3M6UHV0TG9nRXZlbnRzIgog
+ICAgICAgICAgICAgIF0sCiAgICAgICAgICAgICAgIlJlc291cmNlIjogIioiCiAgICAgICAgICAg
+IH0sIHsKICAgICAgICAgICAgICAiRWZmZWN0IjogIkFsbG93IiwKICAgICAgICAgICAgICAiQWN0
+aW9uIjogWyJkeW5hbW9kYjpHZXRJdGVtIiwiZHluYW1vZGI6UHV0SXRlbSJdLAogICAgICAgICAg
+ICAgICJSZXNvdXJjZSI6ICIqIgogICAgICAgICAgICB9LCB7CiAgICAgICAgICAgICAgIkFjdGlv
+biI6ICJzbnM6TGlzdFRvcGljcyIsCiAgICAgICAgICAgICAgIkVmZmVjdCI6ICJBbGxvdyIsCiAg
+ICAgICAgICAgICAgIlJlc291cmNlIjogIioiCiAgICAgICAgICAgIH0sIHsKICAgICAgICAgICAg
+ICAiQWN0aW9uIjogInNuczpQdWJsaXNoIiwKICAgICAgICAgICAgICAiRWZmZWN0IjogIkFsbG93
+IiwKICAgICAgICAgICAgICAiUmVzb3VyY2UiOiB7ICJSZWYiIDogIlNOU1RvcGljIiB9CiAgICAg
+ICAgICAgIH1dCiAgICAgICAgICB9CiAgICAgICAgfV0KICAgICAgfQogICAgfSwKCiAgICAiTGFt
+ZGFGdW5jdGlvbiI6IHsKICAgICAgIlR5cGUiOiAiQVdTOjpMYW1iZGE6OkZ1bmN0aW9uIiwKICAg
+ICAgIlByb3BlcnRpZXMiOiB7CiAgICAgICAgIkhhbmRsZXIiOiAiYXBwLmhhbmRsZXIiLAogICAg
+ICAgICJSb2xlIjogewogICAgICAgICAgIkZuOjpHZXRBdHQiOiBbIkxhbWJkYUV4ZWN1dGlvblJv
+bGUiLCAiQXJuIl0KICAgICAgICB9LAogICAgICAgICJDb2RlIjogewogICAgICAgICAgIlMzQnVj
+a2V0IjogeyAiRm46OkpvaW4iIDogWyAiIiwgWyAic2F5ZXJzci0iLCB7ICJSZWYiIDogIkFXUzo6
+UmVnaW9uIiB9IF0gXSB9ICwKICAgICAgICAgICJTM0tleSI6ICJpcGNoZWNrZXItbGFtYmRhLnpp
+cCIKICAgICAgICB9LAogICAgICAgICJSdW50aW1lIjogIm5vZGVqcyIsCiAgICAgICAgIlRpbWVv
+dXQiOiAiMjUiCiAgICAgIH0KICAgIH0sCiAgICAiU05TVG9waWMiOiB7CiAgICAgICJUeXBlIjog
+IkFXUzo6U05TOjpUb3BpYyIsCiAgICAgICJQcm9wZXJ0aWVzIjogewogICAgICAgICJUb3BpY05h
+bWUiOiAiaXBfY2hhbmdlcl90b3BpYyIKICAgICAgfQogICAgfQogIH0sCiAgIk91dHB1dHMiIDog
+ewogICAgIkxhbWJkYUZ1bmN0aW9uIiA6IHsKICAgICAgIkRlc2NyaXB0aW9uIiA6ICJMYW1iZGEg
+RnVuY3Rpb24iLAogICAgICAiVmFsdWUiIDogeyAiUmVmIiA6ICJMYW1kYUZ1bmN0aW9uIiB9CiAg
+ICB9LAogICAgIlNOU1RvcGljIiA6IHsKICAgICAgIkRlc2NyaXB0aW9uIiA6ICJTTlMgVG9waWMi
+LAogICAgICAiVmFsdWUiIDogeyAiUmVmIiA6ICJTTlNUb3BpYyIgfQogICAgfQogIH0KfQo=
+
+--_006_D1CC43D634864sayersramazoncom_--
