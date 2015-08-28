@@ -11,7 +11,12 @@ Content of the repository is as follow :
 
 ## Courses
 
-This directory contains demos related to [AWS Training](https://aws.amazon.com/training) classes.
+This directory contains demos related to [AWS Training](https://aws.amazon.com/training) classes:
+
+- [Architecting on AWS](course/architecting)
+- [Systems Operations on AWS](course/system_operations)
+- [Developing on AWS](course/developing/)
+- [Big Data in AWS](course/big-data)
 
 ## Self-Paced Labs
 
