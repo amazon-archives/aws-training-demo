@@ -159,7 +159,7 @@
                             }
                         },
                         "sources": {
-                            "/home/ubuntu/": "https://s3-eu-west-1.amazonaws.com/kbitpub/ec2-chefsolo-demo/admin-instance.tar.gz"
+                            "/home/ubuntu/": "https://github.com/awslabs/aws-training-demo/raw/master/course/system_operations/chef/admin-instance-resources.tar.gz"
                         }
                     }
                 }
