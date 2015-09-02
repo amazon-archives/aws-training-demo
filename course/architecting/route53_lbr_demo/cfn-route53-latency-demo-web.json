@@ -1,0 +1,92 @@
+{
+  "Mappings": {
+         "AWSRegionToAMI": {
+             "us-east-1": { "AMI": "ami-05355a6c" },
+             "us-west-2": { "AMI": "ami-0358ce33" },
+             "us-west-1": { "AMI": "ami-3ffed17a" },
+             "eu-west-1": { "AMI": "ami-c7c0d6b3" },
+             "ap-southeast-1": { "AMI": "ami-fade91a8" },
+             "ap-northeast-1": { "AMI": "ami-39b23d38" },
+             "ap-southeast-2": { "AMI": "ami-d16bfbeb" },
+             "sa-east-1": { "AMI": "ami-5253894f" }
+         }
+  },
+  
+  "Parameters" : {
+
+      "HostedDomain": {
+        "Description" : "The hosted domain where we will add DNS records",
+        "Type": "String"
+      }
+
+  },
+ 
+  "Resources" : {
+  	  	  
+	  "WebSecurityGroup" : {
+	        "Type" : "AWS::EC2::SecurityGroup",
+	        "Properties" : {
+	          "GroupDescription" : "Web Access",
+	          "SecurityGroupIngress" : [ 
+				  { "IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"}
+			   ]
+	        }
+	  },
+
+	  "WebServer" : {
+	      "Type" : "AWS::EC2::Instance", 
+	      "Properties" : {
+	        "ImageId" : { "Fn::FindInMap" : [ "AWSRegionToAMI", { "Ref" : "AWS::Region" }, "AMI"]},
+	        "InstanceType" : "m1.small",
+	        "SecurityGroups" : [{ "Ref" : "WebSecurityGroup" }],
+			"UserData" : { "Fn::Base64" : { "Fn::Join" : ["", [
+						"#!/bin/bash", "\n",
+			            "wget -q -O - 'http://aws-emea.info.s3.amazonaws.com/resources/route53-lbr/web-bootstrap.sh' | sh" , "\n",
+	                    "/opt/aws/bin/cfn-signal -e $? ", { "Fn::Base64" : { "Ref" : "WaitForWebServerHandle" }}, "\n"
+						] ] } },
+			"Tags" : [ {"Key" : "Name", "Value" : "WebServer"}]								
+	      }
+	  },
+	  
+	  "WebDNSRecord" : {
+          "Type" : "AWS::Route53::RecordSet",
+          "Properties" : {
+              "HostedZoneName" : { "Fn::Join" : ["", [ {"Ref" : "HostedDomain"}, "."] ]},
+              "Comment" : "CNAME record for Web Server",
+              "Name" : { "Fn::Join" : ["", [
+				  			"web-", 
+							{ "Ref" : "AWS::Region" },
+							".",
+							{"Ref" : "HostedDomain"},
+							"."
+							]]},
+              "Type" : "CNAME",
+              "TTL" : "60",
+              "ResourceRecords" : [ { "Fn::GetAtt" : [ "WebServer", "PublicDnsName" ] } ]
+          }
+      },
+	  
+      "WaitForWebServerHandle" : {
+        "Type" : "AWS::CloudFormation::WaitConditionHandle",
+        "Properties" : {
+        }
+      },
+
+      "WaitForWebServer" : {
+        "Type" : "AWS::CloudFormation::WaitCondition",
+        "DependsOn" : "WebServer",
+        "Properties" : {
+          "Handle" : {"Ref" : "WaitForWebServerHandle"},
+          "Timeout" : "300"
+        }
+      }  
+		
+   },
+   
+   "Outputs" : {
+		"WebServerDNSName" : {
+		      "Description" : "Public DNS name of the newly created Web Server",
+		      "Value" : { "Fn::GetAtt" : [ "WebServer", "PublicDnsName" ] }
+		}
+	}	
+}

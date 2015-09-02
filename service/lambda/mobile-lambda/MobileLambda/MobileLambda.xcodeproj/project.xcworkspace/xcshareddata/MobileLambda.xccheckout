@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>34D36AA4-A45B-4D1C-A92D-8F5E3197A1B9</string>
+	<key>IDESourceControlProjectName</key>
+	<string>MobileLambda</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>EC23FFBA2D6A2293352626B0B79853DD16FAC626</key>
+		<string>ssh://git.amazon.com:2222/pkg/AWS-training-demo</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>service/lambda/mobile-lambda/MobileLambda/MobileLambda.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>EC23FFBA2D6A2293352626B0B79853DD16FAC626</key>
+		<string>../../../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>ssh://git.amazon.com:2222/pkg/AWS-training-demo</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>EC23FFBA2D6A2293352626B0B79853DD16FAC626</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>EC23FFBA2D6A2293352626B0B79853DD16FAC626</string>
+			<key>IDESourceControlWCCName</key>
+			<string>AWS-training-demo</string>
+		</dict>
+	</array>
+</dict>
+</plist>

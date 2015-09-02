@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://java.sun.com/jstl/core"
+      lang="en">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <link rel="icon" href="img/amazon.png"/>
+
+    <title>Hand on Lab : Deploy Java EE applications on AWS Elastic Beanstalk using Docker Containers</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"/>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script type="javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"/>
+
+    <!-- Custom styles for this template -->
+    <link href="css/justified-nav.css" rel="stylesheet"/>
+
+</head>
+
+<f:view>
+
+
+    <div class="container">
+
+        <div class="masthead">
+            <h3 class="text-muted">AWS Hands on Lab - Deploy Java EE Applications on AWS Elastic Beanstalk using Docker Containers</h3>
+        </div>
+
+        <!-- Jumbotron -->
+        <div class="jumbotron">
+
+            <c:choose>
+                <c:when test="#{greeter.message == null or greeter.message == ''}">
+                    <h1>Greeter Service</h1>
+                    <p class="lead">Enter your name below to test your Java EE - based Greeter Service</p>
+
+                    <h:form id="greetForm" class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <!--
+                            <label class="col-sm-2 control-label" for="name">Enter your name</label>
+                            -->
+                            <div class="col-sm-4 col-sm-offset-4">
+                                <h:inputText value="#{name}" class="form-control" id="name" placeholder="Enter your name"/>
+                            </div>
+                        </div>
+
+                        <h:commandButton id="add" value="Greet !" action="#{greeter.setName(name)}" class="btn btn-lg btn-primary"/>
+                    </h:form>
+                </c:when>
+                <c:otherwise>
+                    <h1>#{greeter.message}</h1>
+                    <p/>
+                    <h:form id="resetForm" class="form-horizontal" role="form">
+                        <h:commandButton id="reset" value="Reset" action="#{greeter.setName('')}" class="btn btn-lg btn-success"/>
+                    </h:form>
+                </c:otherwise>
+            </c:choose>
+
+
+        </div>
+
+        <!-- Example row of columns -->
+        <div class="row">
+            <div class="col-lg-4">
+                <h2>About Elastic Beanstalk</h2>
+
+                <p>
+                    AWS Elastic Beanstalk is an easy-to-use service for deploying and scaling web applications and services developed with Java, .NET, PHP, Node.js, Python, Ruby, and Docker on familiar servers such as Apache HTTP Server, Apache Tomcat, Nginx, Passenger, and IIS 7.5/8.
+                </p>
+                <p>
+                    You can simply upload your code and Elastic Beanstalk automatically handles the deployment, from capacity provisioning, load balancing, auto-scaling to application health monitoring. At the same time, you retain full control over the AWS resources powering your application and can access the underlying resources at any time.
+                </p>
+
+                <p><a class="btn btn-primary" href="http://aws.amazon.com/documentation/elastic-beanstalk/" role="button">More details &raquo;</a></p>
+            </div>
+            <div class="col-lg-4">
+                <h2>About Docker</h2>
+
+                <p>
+                    Docker is an open platform for developers and sysadmins to build, ship, and run distributed applications. Consisting of Docker Engine, a portable, lightweight runtime and packaging tool, and Docker Hub, a cloud service for sharing applications and automating workflows, Docker enables apps to be quickly assembled from components and eliminates the friction between development, QA, and production environments. As a result, IT can ship faster and run the same app, unchanged, on laptops, data center VMs, and any cloud.                </p>
+                <p>
+                   <a class="btn btn-primary" href="https://www.docker.com/" role="button">More details &raquo;</a>
+                </p>
+            </div>
+            <div class="col-lg-4">
+                <h2>More Labs</h2>
+
+                <p>
+                    Designed by AWS subject matter experts, self-paced labs provide an opportunity to use the AWS console with step-by-step instructions, giving you hands-on practice to help you gain confidence working with AWS. You have the flexibility to choose labs related to a variety of AWS services.
+                </p>
+                <p>
+                    Self Paced Labs are available to anyone, at any time, via our APN Technology Partner Cloud vLAB on the <a href="http://run.qwikLABS.com">run.qwikLABS.com</a> platform
+                </p>
+                <p><a class="btn btn-primary" href="http://aws.amazon.com/training/self-paced-labs/" role="button">More details &raquo;</a></p>
+            </div>
+        </div>
+
+        <!-- Site footer -->
+        <div class="footer">
+            <p>&copy; Amazon Web Services 2014</p>
+        </div>
+
+    </div>
+    <!-- /container -->
+
+</f:view>
+
+
+</html>
+
+
+
+
+

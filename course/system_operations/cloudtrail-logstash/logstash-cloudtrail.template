@@ -1,0 +1,548 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Deploy Logstash,ElasticSearch,Kibana & Consume AWS Cloudtrail logs",
+    "Mappings": {
+        "AWSInstanceType2Arch": {
+            "m3.large": {
+                "Arch": "64"
+            },
+            "m3.medium": {
+                "Arch": "64"
+            }
+        },
+        "AWSRegionArch2AMI": {
+            "eu-west-1": {
+                "64": "ami-0307d674"
+            },
+			"eu-central-1": {
+				"64": "ami-b83c0aa5"
+			},
+            "us-east-1": {
+                "64": "ami-864d84ee"
+            },
+            "us-west-1": {
+                "64": "ami-a7fdfee2"
+            },
+            "us-west-2": {
+                "64": "ami-e7b8c0d7"
+            },
+            "ap-northeast-1": {
+                "64": "ami-a1124fa0"
+            },
+            "ap-southeast-1": {
+                "64": "ami-12356d40"
+            },
+            "ap-southeast-2": {
+                "64": "ami-fddabdc7"
+            }
+        }
+    },
+	"Outputs" : {
+	    "Instance" : {
+	      "Value" : { "Fn::Join" : ["", [ "http://", { "Fn::GetAtt" : [ "Ec2Instance", "PublicDnsName" ]}, "/kibana-latest/"]] },
+		  "Description" : "DNS Name Of the Kibana Web Page"
+	    }
+	  },
+    "Parameters": {
+        "InstanceType": {
+            "AllowedValues": [
+                "m3.medium",
+                "m3.large",
+                "m3.xlarge"
+            ],
+            "Default": "m3.medium",
+            "Description": "EC2 instance type, e.g. m3.medium",
+            "Type": "String"
+        },
+        "KeyName": {
+            "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+            "Type": "String"
+        },
+        "AggrPrefix": {
+            "Default": "combined/",
+            "Description": "MUST BE CREATE BY YOU on the root of the cloudtrail bucket, This is the monitored Logstash Prefix",
+            "Type": "String"
+        },
+        
+        "SecGroupID": {
+			"Default": "sg-xxxxxx",
+            "Description": "An Existing Security Group with TCP Inbound Access On Port 80/9200",
+            "Type": "String"
+        },
+        "SubnetID": {
+			"Default": "subnet-xxxxxxxx",
+            "Description": "VPC Subnet-ID (Must have Internet Connectivity&Accesible from the internet)",
+            "Type": "String"
+        },
+        "ArtifactsBucket": {
+            "Default": "ArtifcatsS3Bucket",
+            "Description": "Name of your Artifacts S3 bucket",
+            "Type": "String"
+        },
+        "ArtifactsBucketPrefix": {
+            "Default": "ArtifcatsS3BucketName/stashtrail",
+            "Description": "Name of your Artifacts S3 bucket including the prefix (CREATED BY YOU) where we can find the artifacts ",
+            "Type": "String"
+        },
+        "TrailBucket": {
+            "Default": "MyCloudTrailS3BucketName",
+            "Description": "Name of your cloudtrail bucket where all cloudtrail logs live",
+            "Type": "String"
+        },
+        "TrailBucketPrefix": {
+            "Default": "MyCloudTrailS3BucketName/OptionalPrefix/AWSLogs/xxxxxxxxxxxx/CloudTrail",
+            "Description": "The Cloudtrail bucket full prefix (excluding region name), replacing xxxxxxxxxxxx with your AWS Account ID i.e. ctrail-logs/AWSLogs/111111111111/CloudTrail/",
+            "Type": "String"
+        },
+        "BackupBucket": {
+            "Default": "LogBackupS3BucketName",
+            "Description": "Name of the s3 bucket where cloudtrail logs backup will live",
+            "Type": "String"
+        },
+        "CloudTrailMultiRegion": {
+            "Default": "eu-west-1",
+            "Description": "MultiRegion Support? enter region list where cloudtrail is enabled (Comma separated region list) i.e. eu-west-1,eu-central-1 MUST Contain at least a single region where cloudtrail is enabled",
+            "Type": "String"
+		}
+    },
+    "Resources": {
+        "AccessKey": {
+            "Properties": {
+                "UserName": {
+                    "Ref": "LogStashS3User"
+                }
+            },
+            "Type": "AWS::IAM::AccessKey"
+        },
+        "EC2InstanceProfile": {
+            "Properties": {
+                "Path": "/",
+                "Roles": [
+                    {
+                        "Ref": "EC2TrustAccessRole"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::InstanceProfile"
+        },
+        "EC2TrustAccessRole": {
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ],
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "ec2.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "Path": "/"
+            },
+            "Type": "AWS::IAM::Role"
+        },
+        "Ec2Instance": {
+            "Metadata": {
+                "AWS::CloudFormation::Init": {
+                    "Comment1": "Generate hidden files that will be used at arguments for chef role file attribute",
+                    "config": {
+                        "files": {
+						    
+                            "/home/ubuntu/.ak": {
+                                "content": {
+                                    "Ref": "AccessKey"
+                                },
+                                "group": "ubuntu",
+                                "mode": "000644",
+                                "owner": "ubuntu"
+                            },
+                            "/home/ubuntu/.aggrprefix": {
+                                "content": {
+                                    "Ref": "AggrPrefix"
+                                },
+                                "group": "ubuntu",
+                                "mode": "000644",
+                                "owner": "ubuntu"
+                            },
+                            "/home/ubuntu/.region": {
+                                "content": {
+                                    "Ref": "AWS::Region"
+                                },
+                                "group": "ubuntu",
+                                "mode": "000644",
+                                "owner": "ubuntu"
+                            },
+
+                            "/home/ubuntu/.trailbucketprefix": {
+                                "content": {
+                                    "Ref": "TrailBucketPrefix"
+                                },
+                                "group": "ubuntu",
+                                "mode": "000644",
+                                "owner": "ubuntu"
+                            },
+                            "/home/ubuntu/.regionlist": {
+                                "content": {
+                                    "Ref": "CloudTrailMultiRegion"
+                                },
+                                "group": "ubuntu",
+                                "mode": "000644",
+                                "owner": "ubuntu"
+                            },
+                            "/home/ubuntu/.sk": {
+                                "content": {
+                                    "Fn::GetAtt": [
+                                        "AccessKey",
+                                        "SecretAccessKey"
+                                    ]
+                                },
+                                "group": "ubuntu",
+                                "mode": "000644",
+                                "owner": "ubuntu"
+                            },
+							
+			                "/root/.bootstrap.cfg": {
+			                  "content": { 
+			                    "Fn::Join": [
+			                      "",
+			                      [
+			                       "ARTIFACTS=", 
+			                        {
+			                          "Ref": "ArtifactsBucketPrefix"
+			                        }, 
+			                        "\n",
+									"REGION=", 
+									{
+									  "Ref": "AWS::Region"
+									}, 
+									"\n",
+									"LOG='/var/log/bootstrap.log'",
+									"\n",
+									"SOLOLOG='/var/log/chef-solo-install.sh.log'",
+									"\n"
+			                      ]
+			                    ]
+			                  }, 
+			                  "group": "root",
+			                  "mode": "000644",
+			                  "owner": "root"
+			                },
+                            "/home/ubuntu/.backupbucket": {
+                                "content": {
+                                    "Ref": "BackupBucket"
+                                },
+                                "group": "ubuntu",
+                                "mode": "000644",
+                                "owner": "ubuntu"
+                            },
+                            "/home/ubuntu/.trailbucket": {
+                                "content": {
+                                    "Ref": "TrailBucket"
+                                },
+                                "group": "ubuntu",
+                                "mode": "000644",
+                                "owner": "ubuntu"
+                            }
+                        }
+                    }
+                }
+                
+            },
+            "Properties": {
+                "IamInstanceProfile": {
+                    "Ref": "EC2InstanceProfile"
+                },
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSRegionArch2AMI",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        {
+                            "Fn::FindInMap": [
+                                "AWSInstanceType2Arch",
+                                {
+                                    "Ref": "InstanceType"
+                                },
+                                "Arch"
+                            ]
+                        }
+                    ]
+                },
+                "InstanceType": {
+                    "Ref": "InstanceType"
+                },
+                "KeyName": {
+                    "Ref": "KeyName"
+                },
+                "SecurityGroupIds": [
+                    {
+                        "Ref": "SecGroupID"
+                    }
+                ],
+                "SubnetId": {
+                    "Ref": "SubnetID"
+                },
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash\n",
+                                "# Helper function\n",
+                                "function error_exit \n",
+                                "{\n",
+                                "/usr/local/bin/cfn-signal -e 1 -r \"$1\" '",
+                                {
+                                    "Ref": "WebAppServerWaitHandle"
+                                },
+                                "'\n",
+                                "exit 1\n",
+                                "}\n",
+                                "STATUS=0\n",
+								"#Installing cfn tools\n",
+								"apt-get -y update || error_exit 'Failed to apt-get -y update'\n",
+								"apt-get -y install awscli || error_exit 'Failed To Install aws cli'\n",
+								"apt-get -y install python-setuptools || error_exit 'Failed To install python setuptools'\n",
+								"mkdir aws-cfn-bootstrap-latest\n",
+								"curl https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz | tar xz -C aws-cfn-bootstrap-latest --strip-components 1\n",
+								"easy_install aws-cfn-bootstrap-latest\n",
+								"export ARTIF=", { "Ref" : "ArtifactsBucketPrefix" }, "\n",
+								"export REGION=", { "Ref" : "AWS::Region" }, "\n",
+								"echo $ARTIF >> /tmp/env\n",
+								"echo $REGION >> /tmp/env\n",
+								"aws s3 cp s3://${ARTIF}/bootstrap.sh /root/ --region $REGION || error_exit 'Failed to download bootstrap.sh rolling back stack !'\n",
+								"/bin/chmod +x /root/bootstrap.sh || error_exit 'Failed To +x /root/bootstrap.sh' \n",
+								"#Calling cfn-init to parse and install the above metadata section\n",
+								"/usr/local/bin/cfn-init -s ", { "Ref" : "AWS::StackId" }, " -r Ec2Instance ",
+								          "    --region ", { "Ref" : "AWS::Region" }, " || error_exit 'Failed to run cfn-init'\n",
+                                
+								"cd /root && ./bootstrap.sh || error_exit 'Failed Execute /root/bootstrap.sh' \n",
+                                "# All is well so signal success\n",
+                                "/usr/local/bin/cfn-signal -e 0 -r \"Bootstrap has ended successfully\" '",
+                                {
+                                    "Ref": "WebAppServerWaitHandle"
+                                },
+                                "'\n"
+                            ]
+                        ]
+                    }
+                }
+            },
+            "Type": "AWS::EC2::Instance"
+        },
+        "LogCronPolicy": {
+            "Properties": {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "s3:ListBucket",
+                                "s3:ListBucketMultipartUploads"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:s3:::",
+                                        {
+                                            "Ref": "TrailBucket"
+                                        }
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "Action": [
+                                "s3:ListBucket",
+                                "s3:ListBucketMultipartUploads"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:s3:::",
+                                        {
+                                            "Ref": "ArtifactsBucket"
+                                        }
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "Action": [
+                                "s3:Get*",
+                                "s3:DeleteObject*",
+                                "s3:PutObject*"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:s3:::",
+                                        {
+                                            "Ref": "TrailBucket"
+                                        },
+                                        "/*"
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "Action": "s3:GetObject",
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:s3:::",
+                                        {
+                                            "Ref": "ArtifactsBucket"
+                                        },
+                                        "/*"
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "Action": "s3:PutObject",
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:s3:::",
+                                        {
+                                            "Ref": "ArtifactsBucket"
+                                        },
+                                        "/*"
+                                    ]
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "PolicyName": "cron-rw-s3-access",
+                "Roles": [
+                    {
+                        "Ref": "EC2TrustAccessRole"
+                    }
+                ]
+                
+            },
+			"Type": "AWS::IAM::Policy"
+        },
+        "LogStashS3User": {
+		   "Properties": {
+                "Path": "/",
+                "Policies": [
+                    {
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": [
+                                        "s3:ListBucket",
+                                        "s3:ListBucketMultipartUploads"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": {
+                                        "Fn::Join": [
+                                            "",
+                                            [
+                                                "arn:aws:s3:::",
+                                                {
+                                                    "Ref": "TrailBucket"
+                                                }
+                                            ]
+                                        ]
+                                    }
+                                },
+                                {
+                                    "Action": [
+                                        "s3:ListBucket",
+                                        "s3:ListBucketMultipartUploads"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": {
+                                        "Fn::Join": [
+                                            "",
+                                            [
+                                                "arn:aws:s3:::",
+                                                {
+                                                    "Ref": "BackupBucket"
+                                                }
+                                            ]
+                                        ]
+                                    }
+                                },
+                                {
+                                    "Action": [
+                                        "s3:Get*",
+                                        "s3:PutObject*"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": {
+                                        "Fn::Join": [
+                                            "",
+                                            [
+                                                "arn:aws:s3:::",
+                                                {
+                                                    "Ref": "BackupBucket"
+                                                },
+												"/*"
+                                            ]
+                                        ]
+                                    }
+                                },
+                                {
+                                    "Action": [
+                                        "s3:Get*",
+                                        "s3:DeleteObject*",
+                                        "s3:PutObject*"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": {
+                                        "Fn::Join": [
+                                            "",
+                                            [
+                                                "arn:aws:s3:::",
+                                                {
+                                                    "Ref": "TrailBucket"
+                                                },
+												"/*"
+                                            ]
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        "PolicyName": "CloudTrailLogAccess"
+                    }
+                ]
+                
+            },
+		   "Type": "AWS::IAM::User"
+        },
+        "WebAppServerWaitCondition": {
+            "DependsOn": "Ec2Instance",
+            "Properties": {
+                "Handle": {
+                    "Ref": "WebAppServerWaitHandle"
+                },
+                "Timeout": "1200"
+            },
+            "Type": "AWS::CloudFormation::WaitCondition"
+        },
+        "WebAppServerWaitHandle": {
+            "Type": "AWS::CloudFormation::WaitConditionHandle"
+        }
+    }
+}

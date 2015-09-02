@@ -1,0 +1,470 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Chef-Solo System Operation 2.1 Demo, Admin Instance Environment",
+    "Mappings": {
+        "AWSInstanceType2Arch": {
+            "m4.2xlarge": {
+                "Arch": "64"
+            },
+            "m4.large": {
+                "Arch": "64"
+            },
+            "m4.xlarge": {
+                "Arch": "64"
+            }
+        },
+        "AWSRegionArch2AMI": {
+            "ap-northest-1": {
+                "64": "ami-e74b60e6"
+            },
+            "ap-southeast-1": {
+                "64": "ami-d6e7c084"
+            },
+            "ap-southeast-2": {
+                "64": "ami-abeb9e91"
+            },
+            "eu-central-1": {
+                "64": "ami-b83c0aa5"
+            },
+            "eu-west-1": {
+                "64": "ami-f0b11187"
+            },
+            "sa-east-1": {
+                "64": "ami-69d26774"
+            },
+            "us-east-1": {
+                "64": "ami-9eaa1cf6"
+            },
+            "us-west-1": {
+                "64": "ami-076e6542"
+            },
+            "us-west-2": {
+                "64": "ami-3d50120d"
+            }
+        }
+    },
+    "Outputs": {
+        "AdminInstance": {
+            "Description": "DNS Name of the newly created Admin EC2 instance",
+            "Value": {
+                "Fn::GetAtt": [
+                    "AdminEc2Instance",
+                    "PublicDnsName"
+                ]
+            }
+        },
+        "ChefSoloInstanceProfileArn": {
+            "Description": "The ARN of the IAM Instance Profile for the bootstrapped instance",
+            "Value": {
+                "Fn::GetAtt": [
+                    "ChefEC2InstanceProfile",
+                    "Arn"
+                ]
+            }
+        },
+        "ChefSoloInstanceSecurityGroupID": {
+            "Description": "The Security Group ID for the bootstrapped instance",
+            "Value": {
+                "Fn::GetAtt": [
+                    "ChefSoloBootstrappedSecurityGroup",
+                    "GroupId"
+                ]
+            }
+        }
+    },
+    "Parameters": {
+        "ArtifcatsS3Bucket": {
+            "Default": "myartifcatsbucket",
+            "Description": "Name of your S3 Bucket that will store the artifacts (CFN will create and populate the bucket)",
+            "Type": "String"
+        },
+        "InstanceType": {
+            "AllowedValues": [
+                "m4.large",
+                "m4.xlarge",
+                "m4.2xlarge"
+            ],
+            "Default": "m4.large",
+            "Description": "EC2 instance type, e.g. m4.large",
+            "Type": "String"
+        },
+        "KeyName": {
+            "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+            "Type": "AWS::EC2::KeyPair::KeyName"
+        },
+        "SubnetID": {
+            "Description": "VPC Subnet-ID (Must be Public Subnet which assigns PUBLIC IP to newly launched EC2 Instance)",
+            "Type": "AWS::EC2::Subnet::Id"
+        },
+        "myVPCID": {
+            "Description": "The ID of the VPC you will start the instance into",
+            "Type": "AWS::EC2::VPC::Id"
+        }
+    },
+    "Resources": {
+        "AdminEC2InstanceProfile": {
+            "Properties": {
+                "Path": "/",
+                "Roles": [
+                    {
+                        "Ref": "AdminEC2TrustAccessRole"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::InstanceProfile"
+        },
+        "AdminEC2TrustAccessRole": {
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ],
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "ec2.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "Path": "/"
+            },
+            "Type": "AWS::IAM::Role"
+        },
+        "AdminEc2Instance": {
+            "DependsOn": "ArtifactS3Bucket",
+            "Metadata": {
+                "AWS::CloudFormation::Init": {
+                    "Comment": "Generate hidden files to be used as arguments for the bootstrap scripts",
+                    "config": {
+                        "files": {
+                            "/home/ubuntu/.region": {
+                                "content": {
+                                    "Ref": "AWS::Region"
+                                },
+                                "group": "ubuntu",
+                                "mode": "000644",
+                                "owner": "ubuntu"
+                            },
+                            "/home/ubuntu/.s3bucket": {
+                                "content": {
+                                    "Ref": "ArtifcatsS3Bucket"
+                                },
+                                "group": "ubuntu",
+                                "mode": "000644",
+                                "owner": "ubuntu"
+                            }
+                        },
+                        "sources": {
+                            "/home/ubuntu/": "https://github.com/awslabs/aws-training-demo/raw/master/course/system_operations/chef/admin-instance-resources.tar.gz"
+                        }
+                    }
+                }
+            },
+            "Properties": {
+                "IamInstanceProfile": {
+                    "Ref": "AdminEC2InstanceProfile"
+                },
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSRegionArch2AMI",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        {
+                            "Fn::FindInMap": [
+                                "AWSInstanceType2Arch",
+                                {
+                                    "Ref": "InstanceType"
+                                },
+                                "Arch"
+                            ]
+                        }
+                    ]
+                },
+                "InstanceType": {
+                    "Ref": "InstanceType"
+                },
+                "KeyName": {
+                    "Ref": "KeyName"
+                },
+                "NetworkInterfaces" : [{
+                     "AssociatePublicIpAddress" : "True",
+                     "DeleteOnTermination" : "True",
+                     "SubnetId" : { "Ref" : "SubnetID" },
+                     "DeviceIndex" : "0",
+                     "GroupSet" : [ {
+                        "Fn::GetAtt": [
+                            "AdminInstanceSecurityGroup",
+                            "GroupId"
+                        ]
+                    } ]
+                }],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "Admin Instance"
+                    }
+                ],
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash\n",
+                                "# Helper function\n",
+                                "function error_exit \n",
+                                "{\n",
+                                "/usr/local/bin/cfn-signal -e 1 -r \"$1\" '",
+                                {
+                                    "Ref": "AdminServerWaitHandle"
+                                },
+                                "'\n",
+                                "exit 1\n",
+                                "}\n",
+                                "STATUS=0\n",
+                                "#Update OS to latest , cfn tools installation & AWS CLI\n",
+                                "apt-get -y update || error_exit 'Failed to apt-get -y update'\n",
+                                "apt-get -y install python-pip || error_exit 'Failed To Install python-pip'\n",
+                                "pip install awscli || error_exit 'Failed To pip install awscli'\n",
+                                "cd /home/ubuntu/\n",
+                                "mkdir aws-cfn-bootstrap-latest\n",
+                                "curl https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz | tar xz -C aws-cfn-bootstrap-latest --strip-components 1\n",
+                                "easy_install aws-cfn-bootstrap-latest\n",
+                                "#Lets start to build the environment for the demo\n",
+                                "export S3BUCKET=",
+                                {
+                                    "Ref": "ArtifcatsS3Bucket"
+                                },
+                                "\n",
+                                "export REGION=",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "\n",
+                                "echo $S3BUCKET >> /tmp/env\n",
+                                "echo $REGION >> /tmp/env\n",
+                                "#Calling cfn-init to parse and install the above metadata section\n",
+                                "/usr/local/bin/cfn-init -s ",
+                                {
+                                    "Ref": "AWS::StackId"
+                                },
+                                " -r AdminEc2Instance ",
+                                "    --region ",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                " || error_exit 'Failed to run cfn-init check cfn logs'\n",
+                                "#Copying Artifacts to s3 bucket\n",
+                                "cd /home/ubuntu/\n",
+                                "curl -O https://s3-eu-west-1.amazonaws.com/kbitpub/ec2-chefsolo-demo/solo-all.tar.gz || error_exit 'Failed To download solo-all'\n",
+                                "curl -O https://s3-eu-west-1.amazonaws.com/kbitpub/ec2-chefsolo-demo/solo-all.tar.gz.md5 || error_exit 'Failed To download solomd5'\n",
+                                "curl -O https://s3-eu-west-1.amazonaws.com/kbitpub/ec2-chefsolo-demo/roles.tar.gz || error_exit 'Failed To download roles.tar.gz'\n",
+                                "curl -O https://s3-eu-west-1.amazonaws.com/kbitpub/ec2-chefsolo-demo/roles.tar.gz.md5 || error_exit 'Failed To download roles.tar.gz.md5'\n",
+                                "curl -O https://www.opscode.com/chef/install.sh || error_exit 'Failed To download install.sh (chef-solo)'\n",
+                                "aws s3 cp solo-all.tar.gz s3://${S3BUCKET}/cookbook/ --region $REGION || error_exit 'Failed to upload solo-all.tar.gz'\n",
+                                "aws s3 cp solo-all.tar.gz.md5 s3://${S3BUCKET}/cookbook/ --region $REGION || error_exit 'Failed to upload solo-all.tar.gz.md5'\n",
+                                "aws s3 cp install.sh s3://${S3BUCKET}/others/ --region $REGION || error_exit 'Failed to upload install.sh'\n",
+                                "aws s3 cp bootstrap.sh s3://${S3BUCKET}/others/ --acl public-read --region $REGION || error_exit 'Failed to upload bootstrap.sh'\n",
+                                "aws s3 cp solocron.sh s3://${S3BUCKET}/others/ --region $REGION || error_exit 'Failed to upload solocron.sh'\n",
+                                "aws s3 cp roles.tar.gz s3://${S3BUCKET}/roles/ --region $REGION || error_exit 'Failed to upload roles.tar.gz'\n",
+                                "aws s3 cp roles.tar.gz.md5 s3://${S3BUCKET}/roles/ --region $REGION || error_exit 'Failed to upload roles.tar.gz.md5'\n",
+                                "mkdir /home/ubuntu/solorb || error_exit 'Failed to create solorb'\n",
+                                "mkdir /home/ubuntu/nodejson || error_exit 'Failed to create nodejson'\n",
+                                "chown ubuntu.ubuntu /home/ubuntu/ -R || error_exit 'Failed to chown /home/ubuntu/ -R'\n",
+                                "# All is well so signal success\n",
+                                "/usr/local/bin/cfn-signal -e 0 -r \"Bootstrap has ended successfully\" '",
+                                {
+                                    "Ref": "AdminServerWaitHandle"
+                                },
+                                "'\n"
+                            ]
+                        ]
+                    }
+                }
+            },
+            "Type": "AWS::EC2::Instance"
+        },
+        "AdminInstancePolicy": {
+            "Properties": {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": "*",
+                            "Effect": "Allow",
+                            "Resource": "*"
+                        }
+                    ]
+                },
+                "PolicyName": "AdminAllowAll",
+                "Roles": [
+                    {
+                        "Ref": "AdminEC2TrustAccessRole"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::Policy"
+        },
+        "AdminInstanceSecurityGroup": {
+            "Properties": {
+                "GroupDescription": "Allow ssh to the Admin Instance",
+                "SecurityGroupIngress": [
+                    {
+                        "CidrIp": "0.0.0.0/0",
+                        "FromPort": "22",
+                        "IpProtocol": "tcp",
+                        "ToPort": "22"
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "myVPCID"
+                }
+            },
+            "Type": "AWS::EC2::SecurityGroup"
+        },
+        "AdminServerWaitCondition": {
+            "DependsOn": "AdminEc2Instance",
+            "Properties": {
+                "Handle": {
+                    "Ref": "AdminServerWaitHandle"
+                },
+                "Timeout": "1200"
+            },
+            "Type": "AWS::CloudFormation::WaitCondition"
+        },
+        "AdminServerWaitHandle": {
+            "Type": "AWS::CloudFormation::WaitConditionHandle"
+        },
+        "ArtifactS3Bucket": {
+            "Properties": {
+                "BucketName": {
+                    "Ref": "ArtifcatsS3Bucket"
+                }
+            },
+            "Type": "AWS::S3::Bucket"
+        },
+        "ChefEC2InstanceProfile": {
+            "Properties": {
+                "Path": "/",
+                "Roles": [
+                    {
+                        "Ref": "ChefEC2TrustAccessRole"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::InstanceProfile"
+        },
+        "ChefEC2TrustAccessRole": {
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ],
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "ec2.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "Path": "/"
+            },
+            "Type": "AWS::IAM::Role"
+        },
+        "ChefInstancePolicy": {
+            "Properties": {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "s3:ListBucket",
+                                "s3:ListBucketMultipartUploads"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:s3:::",
+                                        {
+                                            "Ref": "ArtifcatsS3Bucket"
+                                        }
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "Action": "s3:Get*",
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:s3:::",
+                                        {
+                                            "Ref": "ArtifcatsS3Bucket"
+                                        },
+                                        "/*"
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "Action": "s3:Get*",
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:s3:::",
+                                        {
+                                            "Ref": "ArtifcatsS3Bucket"
+                                        },
+                                        "/*"
+                                    ]
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "PolicyName": "S3BootstrappedAccess",
+                "Roles": [
+                    {
+                        "Ref": "ChefEC2TrustAccessRole"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::Policy"
+        },
+        "ChefSoloBootstrappedSecurityGroup": {
+            "Properties": {
+                "GroupDescription": "Allow http/ssh to chef boostrapped instance",
+                "SecurityGroupIngress": [
+                    {
+                        "CidrIp": "0.0.0.0/0",
+                        "FromPort": "22",
+                        "IpProtocol": "tcp",
+                        "ToPort": "22"
+                    },
+                    {
+                        "CidrIp": "0.0.0.0/0",
+                        "FromPort": "80",
+                        "IpProtocol": "tcp",
+                        "ToPort": "80"
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "myVPCID"
+                }
+            },
+            "Type": "AWS::EC2::SecurityGroup"
+        }
+    }
+}

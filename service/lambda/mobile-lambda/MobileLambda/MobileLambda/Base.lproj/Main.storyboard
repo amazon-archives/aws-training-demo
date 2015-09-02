@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="MobileLambda" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AWS Lambda Demo" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="15" translatesAutoresizingMaskIntoConstraints="NO" id="7xo-U3-VjH">
+                                <rect key="frame" x="16" y="20" width="568" height="54"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="45"/>
+                                <color key="textColor" red="1" green="0.59999999999999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="What's your first name?" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="15" translatesAutoresizingMaskIntoConstraints="NO" id="OjE-Fe-nki">
+                                <rect key="frame" x="16" y="104" width="568" height="54"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="45"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="CrK-8Z-tvc">
+                                <rect key="frame" x="16" y="166" width="568" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <textInputTraits key="textInputTraits"/>
+                                <connections>
+                                    <action selector="editingChanged:" destination="BYZ-38-t0r" eventType="editingChanged" id="oBq-Si-3g8"/>
+                                </connections>
+                            </textField>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Device Type" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yFC-DE-Vtc">
+                                <rect key="frame" x="16" y="526" width="568" height="54"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="45"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Greetings" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="efw-BT-dFA">
+                                <rect key="frame" x="16" y="464" width="568" height="54"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="45"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kjN-Yt-NXj">
+                                <rect key="frame" x="16" y="204" width="568" height="66"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="45"/>
+                                <state key="normal" title="Send">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="sendAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="UY8-ja-9FG"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="efw-BT-dFA" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="0t2-IQ-Q4Z"/>
+                            <constraint firstItem="yFC-DE-Vtc" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="13S-bS-ig1"/>
+                            <constraint firstItem="OjE-Fe-nki" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="1lQ-uL-LDc"/>
+                            <constraint firstItem="OjE-Fe-nki" firstAttribute="top" secondItem="7xo-U3-VjH" secondAttribute="bottom" constant="30" id="43R-dP-PYu"/>
+                            <constraint firstItem="kjN-Yt-NXj" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="6vS-11-Fvb"/>
+                            <constraint firstItem="efw-BT-dFA" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="7jw-xt-xmS"/>
+                            <constraint firstItem="7xo-U3-VjH" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="DPa-Hf-tC2"/>
+                            <constraint firstItem="7xo-U3-VjH" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="F1i-p6-Jwv"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="yFC-DE-Vtc" secondAttribute="bottom" constant="20" id="Kyu-J5-T3g"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="kjN-Yt-NXj" secondAttribute="trailing" id="TIt-Nu-oaw"/>
+                            <constraint firstItem="CrK-8Z-tvc" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="Vru-cH-DU6"/>
+                            <constraint firstItem="yFC-DE-Vtc" firstAttribute="top" secondItem="efw-BT-dFA" secondAttribute="bottom" constant="8" id="aDd-AB-VDh"/>
+                            <constraint firstItem="OjE-Fe-nki" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="flQ-ko-hrL"/>
+                            <constraint firstItem="CrK-8Z-tvc" firstAttribute="top" secondItem="OjE-Fe-nki" secondAttribute="bottom" constant="8" id="hDq-2T-TFo"/>
+                            <constraint firstItem="7xo-U3-VjH" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="rep-oi-XmP"/>
+                            <constraint firstItem="CrK-8Z-tvc" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="xjp-u0-OhR"/>
+                            <constraint firstItem="yFC-DE-Vtc" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="xr6-56-kco"/>
+                            <constraint firstItem="kjN-Yt-NXj" firstAttribute="top" secondItem="CrK-8Z-tvc" secondAttribute="bottom" constant="8" id="zpN-PT-gen"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="deviceType" destination="yFC-DE-Vtc" id="d9J-vf-RiT"/>
+                        <outlet property="greeting" destination="efw-BT-dFA" id="MyY-cP-odz"/>
+                        <outlet property="name" destination="CrK-8Z-tvc" id="PUo-gH-X6f"/>
+                        <outlet property="send" destination="kjN-Yt-NXj" id="zz7-Ck-xah"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="370" y="303"/>
+        </scene>
+    </scenes>
+</document>
