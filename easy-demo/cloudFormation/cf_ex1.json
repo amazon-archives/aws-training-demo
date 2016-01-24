@@ -1,0 +1,396 @@
+{
+	"AWSTemplateFormatVersion" : "2010-09-09",
+	"Description" : "Builds a simple VPC with one public subnet and one private subnet.",
+	"Parameters" : {
+		"KeyName" : {
+			"Description" : "Name of an existing EC2 KeyPair",
+			"Type" : "AWS::EC2::KeyPair::KeyName"
+		},
+		"EnabledVPCAZ" : {
+			"Description" : "Specify the AZ in which to create the network resources.",
+			"Type" : "AWS::EC2::AvailabilityZone::Name"
+		},
+		"PublicSubnet1CIDR" : {
+			"Description" : "CIDR block for our public subnet",
+			"Type" : "String",
+			"Default" : "10.50.1.0/24",
+			"AllowedPattern" : "[a-zA-Z0-9]+\\..+"
+		},
+		"PrivateSubnet1CIDR" : {
+			"Description" : "CIDR block for our private subnet",
+			"Type" : "String",
+			"Default" : "10.50.2.0/24",
+			"AllowedPattern" : "[a-zA-Z0-9]+\\..+"
+		},
+		"VPCCIDR" : {
+			"Description" : "CIDR Block for the entire VPC",
+			"Type" : "String",
+			"Default" : "10.50.0.0/16",
+			"AllowedPattern" : "[a-zA-Z0-9]+\\..+"
+		}
+	},
+	"Mappings" : {
+		"AmazonLinuxAMI" : {
+			"us-east-1": {
+			        "AMI": "ami-b66ed3de"
+			      },
+			"us-west-1": {
+			        "AMI": "ami-4b6f650e"
+			      },
+			"us-west-2": {
+			        "AMI": "ami-b5a7ea85"
+			      },
+			"eu-west-1": {
+			        "AMI": "ami-6e7bd919"
+			      },
+			"sa-east-1": {
+			        "AMI": "ami-8737829a"
+			      },
+			"ap-southeast-1": {
+			        "AMI": "ami-ac5c7afe"
+			      },
+			"ap-southeast-2": {
+			        "AMI": "ami-63f79559"
+			      },
+			"ap-northeast-1": {
+			        "AMI": "ami-4985b048"
+			}
+		}
+	},
+	"Resources" : {
+		"VPC" : {
+			"Type" : "AWS::EC2::VPC",
+			"Properties" : {
+				"CidrBlock" : {
+					"Ref" : "VPCCIDR"
+				},
+				"Tags" : [{
+						"Key" : "Application",
+						"Value" : {
+							"Ref" : "AWS::StackName"
+						}
+					}, {
+						"Key" : "Name",
+						"Value" : "CloudFormation VPC"
+					}, {
+						"Key" : "Network",
+						"Value" : "Public"
+					}, {
+						"Key" : "Department",
+						"Value" : "IT"
+					}, {
+						"Key" : "Project",
+						"Value" : "Sysops Training"
+					}, {
+						"Key" : "Cost Center",
+						"Value" : "4000"
+					}
+				]
+			}
+		},
+		"PublicSubnet1" : {
+			"Type" : "AWS::EC2::Subnet",
+			"DependsOn" : "VPC",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"CidrBlock" : {
+					"Ref" : "PublicSubnet1CIDR"
+				},
+				"MapPublicIpOnLaunch" : "true",
+				"AvailabilityZone" : {
+					"Ref" : "EnabledVPCAZ"
+				},
+				"Tags" : [{
+						"Key" : "Application",
+						"Value" : {
+							"Ref" : "AWS::StackName"
+						}
+					}, {
+						"Key" : "Name",
+						"Value" : "Public Subnet - CF"
+					}, {
+						"Key" : "Network",
+						"Value" : "Public"
+					}, {
+						"Key" : "Role",
+						"Value" : "ELB 1 Subnet"
+					}, {
+						"Key" : "Department",
+						"Value" : "IT"
+					}, {
+						"Key" : "Project",
+						"Value" : "Sys Ops Training"
+					}, {
+						"Key" : "Cost Center",
+						"Value" : "4000"
+					}
+				]
+			}
+		},
+		"PrivateSubnet1" : {
+			"Type" : "AWS::EC2::Subnet",
+			"DependsOn" : "VPC",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"CidrBlock" : {
+					"Ref" : "PrivateSubnet1CIDR"
+				},
+				"AvailabilityZone" : {
+					"Ref" : "EnabledVPCAZ"
+				},
+				"Tags" : [{
+						"Key" : "Application",
+						"Value" : {
+							"Ref" : "AWS::StackName"
+						}
+					}, {
+						"Key" : "Name",
+						"Value" : "Private Subnet - CF"
+					}, {
+						"Key" : "Network",
+						"Value" : "Private"
+					}, {
+						"Key" : "Role",
+						"Value" : "Application-Web Subnet"
+					}, {
+						"Key" : "Department",
+						"Value" : "IT"
+					}, {
+						"Key" : "Project",
+						"Value" : "Sys Ops Training"
+					}, {
+						"Key" : "Cost Center",
+						"Value" : "4000"
+					}
+				]
+			}
+		},
+		"InternetGateway" : {
+			"Type" : "AWS::EC2::InternetGateway",
+			"Properties" : {
+				"Tags" : [{
+						"Key" : "Application",
+						"Value" : {
+							"Ref" : "AWS::StackName"
+						}
+					}, {
+						"Key" : "Name",
+						"Value" : "Internet Gateway - CF"
+					}, {
+						"Key" : "Network",
+						"Value" : "Public"
+					}, {
+						"Key" : "Department",
+						"Value" : "IT"
+					}, {
+						"Key" : "Project",
+						"Value" : "Sys Ops Training"
+					}, {
+						"Key" : "Cost Center",
+						"Value" : "4000"
+					}
+				]
+			}
+		},
+		"AttachGateway" : {
+			"Type" : "AWS::EC2::VPCGatewayAttachment",
+			"DependsOn" : ["InternetGateway", "VPC"],
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"InternetGatewayId" : {
+					"Ref" : "InternetGateway"
+				}
+			}
+		},
+		"PublicRouteTable" : {
+			"Type" : "AWS::EC2::RouteTable",
+			"DependsOn" : "VPC",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"Tags" : [{
+						"Key" : "Network",
+						"Value" : "Public"
+					}, {
+						"Key" : "Name",
+						"Value" : "Public Route Table - CF"
+					}, {
+						"Key" : "Department",
+						"Value" : "IT"
+					}, {
+						"Key" : "Project",
+						"Value" : "Sys Ops Training"
+					}, {
+						"Key" : "Cost Center",
+						"Value" : "4000"
+					}
+				]
+			}
+		},
+		"PublicRoute" : {
+			"Type" : "AWS::EC2::Route",
+			"DependsOn" : "AttachGateway",
+			"Properties" : {
+				"RouteTableId" : {
+					"Ref" : "PublicRouteTable"
+				},
+				"DestinationCidrBlock" : "0.0.0.0/0",
+				"GatewayId" : {
+					"Ref" : "InternetGateway"
+				}
+			}
+		},
+		"PublicSubnet1RouteTableAssociation" : {
+			"Type" : "AWS::EC2::SubnetRouteTableAssociation",
+			"DependsOn" : "PublicRouteTable",
+			"Properties" : {
+				"SubnetId" : {
+					"Ref" : "PublicSubnet1"
+				},
+				"RouteTableId" : {
+					"Ref" : "PublicRouteTable"
+				}
+			}
+		},
+		"PrivateRouteTable" : {
+			"Type" : "AWS::EC2::RouteTable",
+			"DependsOn" : "VPC",
+			"Properties" : {
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"Tags" : [{
+						"Key" : "Network",
+						"Value" : "AZ1 Private"
+					}, {
+						"Key" : "Name",
+						"Value" : "Private Route Table - CF"
+					}, {
+						"Key" : "Department",
+						"Value" : "IT"
+					}, {
+						"Key" : "Project",
+						"Value" : "Sys Ops Training"
+					}, {
+						"Key" : "Cost Center",
+						"Value" : "4000"
+					}
+				]
+			}
+		},
+		"PrivateRouteAZ1" : {
+			"Type" : "AWS::EC2::Route",
+			"DependsOn" : ["PrivateRouteTable", "NAT"],
+			"Properties" : {
+				"RouteTableId" : {
+					"Ref" : "PrivateRouteTable"
+				},
+				"DestinationCidrBlock" : "0.0.0.0/0",
+				"InstanceId" : {
+					"Ref" : "NAT"
+				}
+			}
+		},
+		"PrivateSubnet1RouteTableAssociation" : {
+			"Type" : "AWS::EC2::SubnetRouteTableAssociation",
+			"DependsOn" : "PrivateRouteTable",
+			"Properties" : {
+				"SubnetId" : {
+					"Ref" : "PrivateSubnet1"
+				},
+				"RouteTableId" : {
+					"Ref" : "PrivateRouteTable"
+				}
+			}
+		},
+		"NAT" : {
+			"Type" : "AWS::EC2::Instance",
+			"DependsOn" : ["PublicSubnet1", "VPC"],
+			"Properties" : {
+				"ImageId" : {
+					"Fn::FindInMap" : [
+						"AmazonLinuxAMI", {
+							"Ref" : "AWS::Region"
+						},
+						"AMI"
+					]
+				},
+				"InstanceType" : "t2.medium",
+				"NetworkInterfaces" : [{
+						"DeviceIndex" : "0",
+						"AssociatePublicIpAddress" : "true",
+						"SubnetId" : {
+							"Ref" : "PublicSubnet1"
+						},
+						"GroupSet" : [{
+								"Ref" : "NATSecurityGroup"
+							}
+						]
+					}
+				],
+				"UserData" : {
+					"Fn::Base64" : {
+						"Fn::Join" : ["", ["#!/bin/sh\n", "echo 1 > /proc/sys/net/ipv4/ip_forward\n", "echo 0 > /proc/sys/net/ipv4/conf/eth0/send_redirects\n", "/sbin/iptables -t nat -A POSTROUTING -o eth0 -s 0.0.0.0/0 -j MASQUERADE\n", "/sbin/iptables-save > /etc/sysconfig/iptables\n", "mkdir -p /etc/sysctl.d/\n", "cat <<EOF > /etc/sysctl.d/nat.conf\n", "net.ipv4.ip_forward = 1\n", "net.ipv4.conf.eth0.send_redirects = 0\n", "EOF\n"]]
+					}
+				},
+				"Tags" : [{
+						"Key" : "Name",
+						"Value" : "NAT"
+					}, {
+						"Key" : "Department",
+						"Value" : "IT"
+					}, {
+						"Key" : "Project",
+						"Value" : "Sys Ops Training"
+					}, {
+						"Key" : "Cost Center",
+						"Value" : "4000"
+					}
+				],
+				"KeyName" : {
+					"Ref" : "KeyName"
+				},
+				"SourceDestCheck" : "false"
+			}
+		},
+		"NATSecurityGroup" : {
+			"Type" : "AWS::EC2::SecurityGroup",
+			"Properties" : {
+				"GroupDescription" : "NAT for private subnets",
+				"VpcId" : {
+					"Ref" : "VPC"
+				},
+				"SecurityGroupIngress" : [{
+						"IpProtocol" : "-1",
+						"FromPort" : "1",
+						"ToPort" : "65535",
+						"CidrIp" : {
+							"Ref" : "PrivateSubnet1CIDR"
+						}
+					}
+				]
+			}
+		}
+	},
+	"Outputs" : {
+		"VpcId" : {
+			"Value" : { "Ref" : "VPC"}
+		},
+		"PublicSubnet1Id" : {
+			"Value" : { "Ref" : "PublicSubnet1" }
+		},
+		"PrivateSubnet1Id" : {
+			"Value" : { "Ref" : "PrivateSubnet1" }
+		},
+		"NATPublicIpAddress" : {
+			"Value" : { "Fn::GetAtt" : ["NAT", "PublicIp"] }
+		}
+	}
+}
