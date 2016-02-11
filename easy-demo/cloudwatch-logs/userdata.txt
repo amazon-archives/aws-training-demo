@@ -13,6 +13,18 @@ cat > /etc/awslogs/awslogs.conf <<EOF
 [general]
 state_file = /var/awslogs/state/agent-state
 
+[cloud-init]
+file = /var/log/cloud-init.log
+log_group_name = cloud-init 
+log_stream_name = {instance_id}
+datetime_format = %b %d %H:%M:%S
+
+[cloud-init-output]
+file = /var/log/cloud-init-output.log
+log_group_name = cloud-init-output
+log_stream_name = {instance_id}
+datetime_format = %b %d %H:%M:%S
+
 [HttpAccessLog]
 file = /var/log/httpd/access_log
 log_group_name = HttpAccessLog
@@ -29,5 +41,7 @@ EOF
 REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed -n 's/.$//p')
 sed -i "s/us-east-1/$REGION/g" /etc/awslogs/awscli.conf
 
+echo "=====user-data======\n" >> /var/log/cloud-init-output.log 
+curl -s http://169.254.169.254/latest/user-data >> /var/log/cloud-init-output.log
 service awslogs start
 chkconfig awslogs on
