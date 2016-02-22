@@ -1,0 +1,82 @@
+[
+{
+  "comment": "DataTransformer JSON",
+  "genericDrugName":"genericDrugName",
+  "adverseReaction":"adverseReaction"
+},
+{
+  "comment": "DataTransformer JSON",
+  "genericDrugName":"LEVOFLOXACIN",
+  "adverseReaction":"Rash on first use"
+},
+{
+  "comment": "DataTransformer JSON",
+  "genericDrugName":"Cefuroxime Axetil",
+  "adverseReaction":"Fever"
+},
+{
+  "comment": "DataTransformer JSON",
+  "genericDrugName":"clarithromycin",
+  "adverseReaction":"Wheezing"
+},
+{
+  "comment": "DataTransformer JSON",
+  "genericDrugName":"Acetaminophen  Aspirin  Caffeine",
+  "adverseReaction":"Severe liver damage"
+},
+{
+  "comment": "DataTransformer JSON",
+  "genericDrugName":"Phenytoin Sodium",
+  "adverseReaction":"Nunc purus."
+},
+{
+  "comment": "DataTransformer JSON",
+  "genericDrugName":"Ciprofloxacin Hydrochloride",
+  "adverseReaction":"Mauris ullamcorper purus sit amet nulla."
+},
+{
+  "comment": "DataTransformer JSON",
+  "genericDrugName":"Ibuprofen",
+  "adverseReaction":"Nulla neque libero  convallis eget  eleifend luctus  ultricies eu  nibh."
+},
+{
+  "comment": "DataTransformer JSON",
+  "genericDrugName":"Octinoxate  Oxybenzone  and Titanium Dioxide",
+  "adverseReaction":"Etiam faucibus cursus urna."
+},
+{
+  "comment": "DataTransformer JSON",
+  "genericDrugName":"ALCOHOL",
+  "adverseReaction":"Aenean lectus."
+},
+{
+  "comment": "DataTransformer JSON",
+  "genericDrugName":"Glycerin",
+  "adverseReaction":"Maecenas leo odio  condimentum id  luctus nec  molestie sed  justo."
+},
+{
+  "comment": "DataTransformer JSON",
+  "genericDrugName":"Angelica Archangelica  Aralia Quinquefolia  Cimicifuga Racemosa  Hydrastis Canadensis  Pulsatilla  Sabina  Sepia",
+  "adverseReaction":"Donec ut mauris eget massa tempor convallis."
+},
+{
+  "comment": "DataTransformer JSON",
+  "genericDrugName":"Arizona Ash",
+  "adverseReaction":"Vivamus tortor."
+},
+{
+  "comment": "DataTransformer JSON",
+  "genericDrugName":"Mafenide acetate",
+  "adverseReaction":"Mauris lacinia sapien quis libero."
+},
+{
+  "comment": "DataTransformer JSON",
+  "genericDrugName":"Alumina  Bryonia Alba",
+  "adverseReaction":"Nam ultrices  libero non mattis pulvinar  nulla pede ullamcorper augue  a suscipit nulla elit ac nulla."
+},
+{
+  "comment": "DataTransformer JSON",
+  "genericDrugName":"Cetirizine HCl",
+  "adverseReaction":"Nam dui."
+}
+]

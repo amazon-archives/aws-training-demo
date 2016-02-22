@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse.ant.import?>
+<project basedir="." default="build" name="readySetGoJavaLabMore">
+	<target name="allclean" depends="clean">
+		<delete dir="junit"/>		
+	</target>
+	<target name="run" depends="build, ReadySetGo" />
+ 
+</project>

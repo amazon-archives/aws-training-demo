@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse.ant.import?>
+<project basedir="." default="build" name="s3JavaLabMore">
+	<target name="allclean" depends="clean">
+		<delete dir="junit"/>		
+	</target>
+	<target name="run" depends="allclean, build, DataTransformer" />
+
+	<target name="test" depends="allclean, build, DataTransformerTest">
+         
+    </target>
+</project>
