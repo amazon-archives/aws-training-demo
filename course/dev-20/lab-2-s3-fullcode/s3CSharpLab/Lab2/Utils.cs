@@ -5,6 +5,8 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using System.IO;
 using System.Linq;
+using System.Diagnostics;
+
 
 namespace Lab2
 {
@@ -29,23 +31,11 @@ namespace Lab2
             RegionEndpoint region = RegionEndpoint.USWest2;
             AmazonS3Client s3ForLabBucket;
             string textContent = null;
+            bool exist = false;
 
             s3ForLabBucket = new AmazonS3Client(region);
 
-            ListBucketsResponse responseBuckets = s3ForStudentBuckets.ListBuckets();
-
-            foreach (S3Bucket bucket in responseBuckets.Buckets)
-            {
-                if (bucket.BucketName == DataTransformer.InputBucketName)
-                {
-                    DataTransformer.VerifyBucketOwnership(DataTransformer.InputBucketName);
-                    break;
-                }
-                else
-                {
-                    DataTransformer.CreateBucket(DataTransformer.InputBucketName);
-                }
-            }
+            DataTransformer.CreateBucket(DataTransformer.InputBucketName);            
 
             for (int i = 0; i < labBucketDataFileKeys.Length; i++)
             {
