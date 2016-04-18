@@ -1,0 +1,88 @@
+{
+  "objects" :  [
+    {
+      "id" : "DefaultSchedule",
+      "name" : "RunOnce",
+      "occurrences" : "1",
+      "startAt" : "FIRST_ACTIVATION_DATE_TIME",
+      "type" : "Schedule",
+      "period" : "1 Day"
+    },
+    {
+      "id" : "Default",
+      "scheduleType" : "cron",
+      "failureAndRerunMode" : "CASCADE",
+      "schedule" : { "ref" : "DefaultSchedule" },
+      "name" : "Default",
+      "pipelineLogUri" : "s3://#{myBucketName}/logs-common-crawl-pipe-line",
+      "role" : "DataPipelineDefaultRole",
+      "resourceRole" : "DataPipelineDefaultResourceRole"
+    },
+    {
+      "id" : "ActivityId_01",
+      "schedule" : { "ref" : "DefaultSchedule" },
+      "name" : "copy-public-data-set-to-hdfs",
+      "runsOn" : { "ref" : "EmrClusterId_01" },
+      "type" : "EmrActivity",
+      "step" : [ "file:///home/hadoop/lib/emr-s3distcp-1.0.jar,--s3Endpoint,s3-external-1.amazonaws.com,--src,#{myPathToDataSet},--dest,hdfs:///grep-data/"]
+    },
+    {
+      "id" : "ActivityId_02",
+      "schedule" : { "ref" : "DefaultSchedule" },
+      "name" : "grep-results-to-hdfs",
+      "runsOn" : { "ref" : "EmrClusterId_01" },
+      "type" : "EmrActivity",
+      "step" : ["file:///home/hadoop/hadoop-examples.jar,grep,/grep-data/,/grep-output/,[Bb]ig [Dd]ata is ([a-zA-Z]+)"],
+      "dependsOn" : { "ref" : "ActivityId_01" }
+    },
+    {
+      "id" : "ActivityId_03",
+      "schedule" : { "ref" : "DefaultSchedule" },
+      "name" : "write-results-to-dynamo",
+      "runsOn" : { "ref" : "EmrClusterId_01" },
+      "type" : "EmrActivity",
+      "step" : ["s3://elasticmapreduce/libs/script-runner/script-runner.jar,s3://#{myBucketName}/emr.py"],
+      "dependsOn" : { "ref" : "ActivityId_02" }
+    },
+    {
+      "id" : "EmrClusterId_01",
+      "region" : "#{myClusterResourceRegion}",
+      "amiVersion" : "3.4.0",
+      "schedule" : { "ref" : "DefaultSchedule" },
+      "keyPair" : "#{myKeyPairName}",
+      "masterInstanceType" : "m1.medium",
+      "coreInstanceCount" : "2",
+      "coreInstanceType" : "m3.xlarge",
+      "name" : "emr-cluster",
+      "type" : "EmrCluster",
+      "terminateAfter" : "55 Minutes",
+      "resourceRole": "DataPipelineDefaultResourceRole",
+      "role": "DataPipelineDefaultRole"
+    }
+  ],
+  "parameters": [
+    {
+      "id": "myClusterResourceRegion",
+      "watermark": "Your region. for example : us-west-2",
+      "description": "Region to launch cluster in",
+      "type": "String"
+    },
+    {
+      "id": "myPathToDataSet",
+      "watermark": "s3://aws-publicdatasets/common-crawl/crawl-data/CC-MAIN-2014-23/segments/1404776400583.60/wet/",
+      "default": "s3://aws-publicdatasets/common-crawl/crawl-data/CC-MAIN-2014-23/segments/1404776400583.60/wet/",
+      "description": "Path to a part of the commmon crawl data set",
+      "type": "String"
+    },
+    {
+      "id": "myKeyPairName",
+      "description": "Name of the key pair for the EMR instances. Please make sure it's in the chosen region",
+      "type": "String"
+    },
+    {
+      "id": "myBucketName",
+      "description": "Name of the bucket with the artifacts",
+      "type": "String"
+    }
+  ]
+}

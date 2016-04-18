@@ -1,0 +1,62 @@
+{
+
+  
+  "Parameters" : {
+
+      "SharedSecret": {
+        "Description" : "The IPSec SharedSecret",
+        "Type": "String",
+		"Default" : "SharedSecret"
+      },
+      "Username": {
+        "Description" : "The VPN username",
+        "Type": "String",
+		"Default" : "username"
+      },
+      "Password": {
+        "Description" : "The VPN password",
+        "Type": "String",
+		"Default" : "password"
+      },
+      "HostedDomain": {
+        "Description" : "The hosted domain where we will add DNS records",
+        "Type": "String",
+		"Default" : "example.com"
+      }
+
+  },
+  
+  "Resources" : {
+	  "WebStack" : {
+	  	       "Type" : "AWS::CloudFormation::Stack",
+	  	       "Properties" : {
+	  	          "TemplateURL" : "http://s3-eu-west-1.amazonaws.com/aws-emea.info/resources/route53-lbr/cfn-route53-latency-demo-web.json",
+	              "TimeoutInMinutes" : "60",
+				  "Parameters" : {
+				  	"HostedDomain" : {"Ref" : "HostedDomain"}
+				  }
+			   }
+	  },
+	  "VPNStack" : {
+	  	       "Type" : "AWS::CloudFormation::Stack",
+	  	       "Properties" : {
+	  	          "TemplateURL" : "http://s3-eu-west-1.amazonaws.com/aws-emea.info/resources/route53-lbr/cfn-route53-latency-demo-vpn.json",
+	              "TimeoutInMinutes" : "60",
+				  "Parameters" : {
+					 "SharedSecret" : {"Ref" : "SharedSecret"},
+					 "Username" : {"Ref" : "Username"},
+					 "Password" : {"Ref" : "Password"},
+				     "HostedDomain" : {"Ref" : "HostedDomain"}
+				  }
+			   }
+	  }
+  },
+  
+  "Outputs": {
+     "StackRef": {"Value": { "Ref" : "WebStack"}},
+     "WebServerDNSName" : {
+           "Value" : { "Fn::GetAtt" : [ "WebStack", "Outputs.WebServerDNSName" ] }
+     }
+  }  
+  
+}
