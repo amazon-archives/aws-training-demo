@@ -23,7 +23,7 @@ console.log('Loading Lambda function');
 // initialize libraries and global values
 var aws = require('aws-sdk');
 var Q   = require('q');
-var fs  = require('fs')
+var fs  = require('fs');
 
 
 function init() {
